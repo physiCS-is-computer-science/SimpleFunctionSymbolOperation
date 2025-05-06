@@ -48,5 +48,24 @@ int main(void) {
         }
         __printer1(command_type);
         getchar();
+
+        /* COMPUTE MODULE */
+        switch (command_type) {
+        case 1:
+            struct diff(input_command);
+            break;
+        case 2:
+            struct diff_num(input_command);
+            break;
+        case 3:
+            struct inte(input_command);
+            break;
+        case 4:
+            struct inte_num(input_command);
+            break;
+        case 5:
+            strcut compute(input_command);
+            break;
+        }
     }
 }
