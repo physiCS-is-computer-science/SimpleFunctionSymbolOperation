@@ -1,0 +1,39 @@
+/***
+ *    此处调试和 CMake 调试不是一个东西;
+ *    这个launch文件没有调试前编译语句"preLaunchTasks: ..."(12行)，因此必须存在exe文件才可以调试;
+ *    并且 16 行处("program": "")，需要手动输入 exe 文件名，否则无法调试(当前此文件我手动要求找 CMake 生成路径下的 exe 文件);
+ *    倘若 f6 直接运行(coderunner插件)，生成 exe 文件(只能编译单个 .c 文件)在 .c 文件同目录下，因为指定目录的 settings.json
+ * 文件中，设置 code-runner's setting(该文件11行开始) 被注释掉了，导致该插件输出在默认路径;
+ ***/
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            // "preLaunchTask": "C/C++: gcc.exe 生成活动文件", // Before starting debugging, first go to the tasks.json file of the lable to compile and generate the exe file.
+            "name": "(gdb) 启动",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/../bin/symbol_operation.exe", // Find the exe file in this path
+            /* Parameter options passed to the main function (int main(arg_c, arg_v)) */
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "D:\\MinGW\\mingw64\\bin\\gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "将反汇编风格设置为 Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

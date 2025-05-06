@@ -1,0 +1,41 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "math.h": "c",
+        "stdlib.h": "c",
+        "ctype.h": "c",
+        "time.h": "c",
+        "windows.h": "c",
+        "string.h": "c",
+        "for_operation.h": "c",
+        "temp_macro.h": "c"
+    },
+    // /* code-runner's setting */
+    //   "code-runner.executorMap": { 
+    //   "c": "cd $dir && gcc -g $fileName -o bin\\$fileNameWithoutExt.exe && bin\\$fileNameWithoutExt.exe"
+    //   },
+    // "code-runner.runInTerminal": true,
+    // "code-runner.saveFileBeforeRun": true,
+    // /* Done */
+    /* Format codes setting */
+    "C_Cpp.clang_format_style": "{BasedOnStyle: LLVM, IndentWidth: 4,BreakBeforeBraces: Custom, ColumnLimit: 0, AlignTrailingComments: false, PointerAlignment: Left, BinPackParameters: false, BreakBeforeBinaryOperators: None, AllowAllParametersOfDeclarationOnNextLine: false, BraceWrapping: {BeforeElse: true, AfterArrayInitializer: true}}",
+    /* 以下配置用于设置代码元素为斜体 */
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "scope": [
+                    "comment", // 注释（包括 // 和 /* */）
+                    "keyword.control", // for/if/while 等控制关键字
+                    "storage.type", // int/char/float 等类型关键字
+                    "meta.preprocessor.keyword", // #include/#define 等预处理关键字
+                    "variable.parameter", // 函数参数
+                    "string" // 字符串
+                ],
+                "settings": {
+                    "fontStyle": "italic"
+                }
+            }
+        ]
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+}
