@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <windows.h>
 
 static void table(int length, char left, char middle, char right);
@@ -13,17 +14,24 @@ static void table(int length, char left, char middle, char right) {
 
 /* 传递错误字符串指针、错误字符指针，做差标识出第一个错误处 */
 void wrong_print(const char* wrong_str, const char* first_wrong_ch) {
-    ptrdiff_t delta = first_wrong_ch - wrong_str;
+    ptrdiff_t length = strchr(wrong_str, '\0') - wrong_str;
+    ptrdiff_t delta_left = first_wrong_ch - wrong_str;
+    ptrdiff_t delta_right = length - delta_left - 1;
 
-    table(50, '/', '=', '\\');
-    printf(" This is the first error for this string: \n ");
+    printf("\n This is the first error for this string: \n");
+    table((int)length + 2, '/', '=', '\\');
+    putchar(' ');
     printf(wrong_str);
     printf("\n ");
-    for (int i = 1; i <= delta; i++)
+
+    for (int i = 1; i <= delta_left; i++)
+        putchar(' ');
+    printf("^");
+    for (int i = delta_left; i < delta_left + delta_right; i++)
         putchar('~');
-    printf("^\n");
-    table(50, '\\', '=', '/');
-    putchar('\n');
+    printf("\n");
+
+    table((int)length + 2, '\\', '=', '/');
 }
 
 /* help to choose module */
