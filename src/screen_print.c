@@ -16,9 +16,8 @@ static void table(int length, char left, char middle, char right) {
 void wrong_print(const char* wrong_str, const char* first_wrong_ch) {
     ptrdiff_t length = strchr(wrong_str, '\0') - wrong_str;
     ptrdiff_t delta_left = first_wrong_ch - wrong_str;
-    ptrdiff_t delta_right = length - delta_left - 1;
 
-    printf("\n This is the first error for this string: \n");
+    printf("\nThis is the first error for this string: \n");
     table((int)length + 2, '/', '=', '\\');
     putchar(' ');
     printf(wrong_str);
@@ -27,7 +26,7 @@ void wrong_print(const char* wrong_str, const char* first_wrong_ch) {
     for (int i = 1; i <= delta_left; i++)
         putchar(' ');
     printf("^");
-    for (int i = delta_left; i < delta_left + delta_right; i++)
+    for (int i = delta_left; i < length - 1; i++)
         putchar('~');
     printf("\n");
 
