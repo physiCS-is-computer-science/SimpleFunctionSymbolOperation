@@ -38,7 +38,10 @@ void __printer1(int a) {
     }
 }
 
-void buffer_clear(void) {
+void buffer_clear(char* screen_print) {
+    if (screen_print != NULL){
+        printf("%s", screen_print);
+    }
     while (getchar() != '\n')
         continue;
 }
