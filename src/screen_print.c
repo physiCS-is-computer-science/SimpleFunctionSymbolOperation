@@ -13,11 +13,12 @@ static void table(int length, char left, char middle, char right) {
 }
 
 /* 传递错误字符串指针、错误字符指针，做差标识出第一个错误处 */
-void wrong_print(const char* wrong_str, const char* first_wrong_ch) {
+void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str) {
     ptrdiff_t length = strchr(wrong_str, '\0') - wrong_str;
     ptrdiff_t delta_left = first_wrong_ch - wrong_str;
 
-    printf("\nThis is the first error for this string: \n");
+    if (print_str != NULL)
+        printf("%s\n", print_str);
     table((int)length + 2, '/', '=', '\\');
     putchar(' ');
     printf(wrong_str);
@@ -28,7 +29,7 @@ void wrong_print(const char* wrong_str, const char* first_wrong_ch) {
     printf("^");
     for (int i = delta_left; i < length - 1; i++)
         putchar('~');
-    printf("\n");
+    putchar('\n');
 
     table((int)length + 2, '\\', '=', '/');
 }

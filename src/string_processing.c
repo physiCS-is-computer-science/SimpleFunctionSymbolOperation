@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-void wrong_print(const char* wrong_str, const char* first_wrong_ch);
-void buffer_clear(void);
+void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
+void buffer_clear(char* screen_print);
 int format_argument_char(const char* command_input, const char* left_bracket);
 
 /* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析 */
@@ -23,9 +23,9 @@ int format_input_command(char command[]) {
     end_ptr = strchr(command, '\0');
     defference = end_ptr - command;
     if (defference >= COMMAND_SIZE - 1) {
-        buffer_clear(); // 只有此时才需要 buffer_clear()，否则字符串没超过最大限定长度，缓冲区没东西，buffer_clear() 导致程序暂停
+        buffer_clear(NULL); // 只有此时才需要 buffer_clear()，否则字符串没超过最大限定长度，缓冲区没东西，buffer_clear() 导致程序暂停
         printf("\nThe string length has reached the maxium allowable length(%d)", COMMAND_SIZE);
-        wrong_print(command, end_ptr);
+        wrong_print(command, end_ptr, NULL);
         return 0;
     }
 
@@ -37,7 +37,7 @@ int format_input_command(char command[]) {
     strcpy(command_cpy, command); // 不改变原参数而需要复制，前面已经保证了此处字符串可以装的下
     temp_ptr = strchr(command_cpy, '('); // find command string
     if (temp_ptr == NULL) {
-        wrong_print(command_cpy, command_cpy);
+        wrong_print(command_cpy, command_cpy, "\nThis is the first error for this string: \n");
         return 0;
     }
     else
@@ -50,7 +50,7 @@ int format_input_command(char command[]) {
     else if (strcmp(COMP_STR, command_cpy) == 0)
         type = 3;
     else {
-        wrong_print(command_cpy, command_cpy);
+        wrong_print(command_cpy, command_cpy, "\nThis is the first error for this string: \n");
         return 0;
     }
     *temp_ptr = '('; // 恢复先
@@ -79,7 +79,7 @@ int format_input_command(char command[]) {
         if (arg_mode == 0)
             return 0;
         else if (arg_mode == 1) {
-            wrong_print(command, temp_ptr + 1);
+            wrong_print(command, temp_ptr + 1, "\nThis is the first error for this string: \n");
             return 0;
         }
         else if (arg_mode == 2)
@@ -89,7 +89,7 @@ int format_input_command(char command[]) {
     }
 
     printf("There are some wrongs in this string\n");
-    wrong_print(command, command);
+    wrong_print(command, command, "\nThis is the first error for this string: \n");
     return 0;
 }
 
@@ -101,7 +101,7 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
 
     first_comma = strchr(left_bracket, ',');
     if (first_comma == NULL) {
-        wrong_print(command_output, left_bracket + 1);
+        wrong_print(command_output, left_bracket + 1, "\nThis is the first error for this string: \n");
         return 0;
     }
 
@@ -109,14 +109,14 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
     if (second_comma == NULL) { // 此时可能是两个参数(一个逗号)
         end_bracket = strchr(first_comma, ')');
         if (end_bracket == NULL) {
-            wrong_print(command_output, first_comma + 1);
+            wrong_print(command_output, first_comma + 1, "\nThis is the first error for this string: \n");
             return 0;
         }
         else {
             if (*(end_bracket + 1) == '\0')
                 return 1;
             else {
-                wrong_print(command_output, end_bracket + 1);
+                wrong_print(command_output, end_bracket + 1, "\nThis is the first error for this string: \n");
                 return 0;
             }
         }
@@ -124,14 +124,14 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
     else { // 可能是三个参数(两个逗号)
         end_bracket = strchr(second_comma, ')');
         if (end_bracket == NULL) {
-            wrong_print(command_output, second_comma + 1);
+            wrong_print(command_output, second_comma + 1, "\nThis is the first error for this string: \n");
             return 0;
         }
         else {
             if (*(end_bracket + 1) == '\0')
                 return 2;
             else {
-                wrong_print(command_output, end_bracket + 1);
+                wrong_print(command_output, end_bracket + 1, "\nThis is the first error for this string: \n");
                 return 0;
             }
         }
