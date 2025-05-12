@@ -3,6 +3,12 @@
 #include <string.h>
 
 void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
+TreeNode* convert_tree(const Token* postfix, int num);
+int infix_to_postfix(const Token* token, int token_num, Token* postfix);
+void destroy_tree(TreeNode* root);
+int identify_token(const char* exp, Token* token);
+void initialize_token(Token* token);
+void print_token(const Token* token, int size);
 void buffer_clear(char* screen_print);
 int format_argument_char(const char* command_input, const char* left_bracket);
 
@@ -140,9 +146,50 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
 
 /* 格式正确返回 1，错误返回 0 */
 int format_math_argument(const char command[], int mode) {
+    TreeNode* exp_root;
+    char* exp_start;
+    char expression[COMMAND_SIZE];
+
+    exp_start = strchr(command, '(');
+    exp_start++;
+    if (*exp_start == ',') { // this situation is like: diff(,)
+        wrong_print(command, exp_start, "-=-= The expression is not exist =-=-");
+        return 0;
+    }
+    strcpy(expression, exp_start); // exp_start is  the next pointer of '('
+    *strchr(expression, ',') = '\0';
+
+    /* identify the/first(mode5 have 2 expresion) expression
+     * input and convert infix expression to token,
+     * and check the expression tree times */
+    int exp_token_num, exp_postfix_num;
+    Token exp_token[COMMAND_SIZE], exp_postfix[COMMAND_SIZE];
+    while (1) {
+        initialize_token(exp_token); // reset
+        initialize_token(exp_postfix);
+
+        exp_token_num = identify_token(expression, exp_token); // convert to token and check
+        if (exp_token_num == 0)
+            return 0;
+        print_token(exp_token, exp_token_num);
+
+        exp_postfix_num = infix_to_postfix(exp_token, exp_token_num, exp_postfix); // create postfix and check
+        if (exp_postfix_num == 0)
+            return 0;
+        print_token(exp_postfix, exp_postfix_num);
+
+        exp_root = convert_tree(exp_postfix, exp_postfix_num); // creat expression tree and check
+        if (exp_root == NULL)
+            return 0;
+
+        buffer_clear("Enter to close the process"); // testest
+        break;
+    }
+    destroy_tree(exp_root);
+    buffer_clear("buffer_clear(): test"); // testest
+
     switch (mode) {
     case 1:
-
     case 2:
     case 3:
     case 4:

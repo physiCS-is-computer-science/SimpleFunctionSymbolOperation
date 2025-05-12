@@ -1,3 +1,4 @@
+#include "temp_macro.h"
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -46,4 +47,19 @@ void main_menu(void) {
     printf(" 5.comp(function1, function2, operator)\n");
     printf(" 6.Enter to quit\n");
     table(44, '+', '-', '+');
+}
+
+void print_token(const Token* token, int size) {
+    for (int i = 0; i < size; i++) {
+        if (token[i].isnum == 't') {
+            printf("'%d' ", token[i].num);
+        }
+        else if (token[i].isoperator == 't') {
+            printf("'%c' ", token[i].operator);
+        }
+        else if (token[i].isvariable == 't') {
+            printf("'%s' ", token[i].variable);
+        }
+    }
+    putchar('\n');
 }

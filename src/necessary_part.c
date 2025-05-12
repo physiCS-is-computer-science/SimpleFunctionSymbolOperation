@@ -39,9 +39,62 @@ void __printer1(int a) {
 }
 
 void buffer_clear(char* screen_print) {
-    if (screen_print != NULL){
+    if (screen_print != NULL) {
         printf("%s", screen_print);
     }
     while (getchar() != '\n')
         continue;
+}
+
+void destroy_tree(TreeNode* root) {
+    if (root == NULL)
+        return;
+    destroy_tree(root->left);
+    destroy_tree(root->right);
+
+    if (root->is_operand == 't')
+        printf("freedom '%d'\n", root->operand);
+    if (root->is_operator == 't')
+        printf("freedom '%c'\n", root->operator);
+    if (root->is_x == 't')
+        printf("freedom '%s'\n", root->x);
+
+    free(root);
+}
+
+TreeNode* link_node(TreeNode* left_leaf, TreeNode* right_leaf) {
+    TreeNode* current = (TreeNode*)malloc(sizeof(TreeNode));
+    current->left = left_leaf;
+    current->right = right_leaf;
+    return current;
+}
+
+/* 创建左右树叶指向NULL的节点 */
+TreeNode* a_node(int type) {
+    TreeNode* node;
+    node = (TreeNode*)malloc(sizeof(TreeNode));
+    if (type == 1) { // num
+        node->is_operand = 't';
+        node->is_x = 'f';
+        node->is_operator = 'f';
+    }
+    else if (type == 2) { // x
+        node->is_operand = 'f';
+        node->is_x = 't';
+        node->is_operator = 'f';
+    }
+    else if (type == 3) { // +-*/^
+        node->is_operand = 'f';
+        node->is_x = 'f';
+        node->is_operator = 't';
+    }
+    else {
+        free(node);
+        buffer_clear("-=-= a_node(): No expected parameters was =-=-");
+        return NULL;
+    }
+    node->left = NULL;
+    node->right = NULL;
+
+    return node;
 }
