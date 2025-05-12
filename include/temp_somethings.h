@@ -2,6 +2,14 @@
 
 #pragma once
 
+#define COMMAND_SIZE 150
+#define OPERATOR "+-*/^"
+#define TOKEN_SYMBOL "+-*/^()"
+
+#define DIFF_STR "diff"
+#define INTE_STR "inte"
+#define COMP_STR "comp"
+
 typedef struct BinaryTreeCell {
     char is_operator;
     char is_operand;
@@ -24,10 +32,5 @@ typedef struct ExpressionTerm { // true is not-'\0', false is '\0'
     int num;
 } Token;
 
-#define COMMAND_SIZE 150
-#define OPERATOR "+-*/^"
-#define TOKEN_SYMBOL "+-*/^()"
-
-#define DIFF_STR "diff"
-#define INTE_STR "inte"
-#define COMP_STR "comp"
+void buffer_clear(char* screen_print);
+void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);

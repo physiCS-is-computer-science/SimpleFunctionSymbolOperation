@@ -9,13 +9,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void __f5_stop_getchar(void);
-void __process_quit_getchar(void);
-void __printer1(int a);
-void buffer_clear(char* screen_print);
-void main_menu(void);
-int format_input_command(char command[]); // if the string command of inputing is format, return 1 ~ 5
 int format_math_argument(const char command[], int mode); // check the argument of command, return 1/0
+int format_input_command(char command[]); // if the string command of inputing is format, return 1 ~ 5
+void __process_quit_getchar(void);
+void __f5_stop_getchar(void);
+void __printer1(int a);
+void main_menu(void);
 
 int main(void) {
     int command_type, isformat;

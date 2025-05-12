@@ -2,15 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
-void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
-int identify_token(const char* exp, Token* token, const char* comm);
 int infix_to_postfix(const Token* token, int token_num, Token* postfix, const char* comm);
-TreeNode* convert_tree(const Token* postfix, int num, const char* comm);
-void destroy_tree(TreeNode* root);
-void initialize_token(Token* token);
-void print_token(const Token* token, int size);
-void buffer_clear(char* screen_print);
 int format_argument_char(const char* command_input, const char* left_bracket);
+TreeNode* convert_tree(const Token* postfix, int num, const char* comm);
+int identify_token(const char* exp, Token* token, const char* comm);
+void print_token(const Token* token, int size);
+void initialize_token(Token* token);
+void destroy_tree(TreeNode* root);
 
 /* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析 */
 int format_input_command(char command[]) {

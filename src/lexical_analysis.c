@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
-void buffer_clear(char* screen_print);
-TreeNode* a_node(int type);
 TreeNode* link_node(TreeNode* left_leaf, TreeNode* right_leaf);
 void destroy_tree(TreeNode* root);
+TreeNode* a_node(int type);
 
 int identify_token(const char* exp, Token* token, const char* comm) {
     char copy_exp[COMMAND_SIZE];
