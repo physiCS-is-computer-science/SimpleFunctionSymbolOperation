@@ -1,4 +1,4 @@
-#include "temp_macro.h"
+#include "temp_somethings.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
