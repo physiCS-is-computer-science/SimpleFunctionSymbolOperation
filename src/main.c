@@ -48,7 +48,8 @@ int main(void) {
             }
         }
         __printer1(command_type);
-        buffer_clear("testest");
+
+        buffer_clear("-=-= testest =-=-"); // test
 
         // /* COMPUTE MODULE */
         // switch (command_type) {

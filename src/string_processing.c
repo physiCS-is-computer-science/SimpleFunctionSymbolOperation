@@ -3,10 +3,12 @@
 #include <string.h>
 
 void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
-TreeNode* convert_tree(const Token* postfix, int num);
-int infix_to_postfix(const Token* token, int token_num, Token* postfix);
+
+int identify_token(const char* exp, Token* token, const char* comm);
+int infix_to_postfix(const Token* token, int token_num, Token* postfix, const char* comm);
+TreeNode* convert_tree(const Token* postfix, int num, const char* comm);
+
 void destroy_tree(TreeNode* root);
-int identify_token(const char* exp, Token* token);
 void initialize_token(Token* token);
 void print_token(const Token* token, int size);
 void buffer_clear(char* screen_print);
@@ -17,7 +19,7 @@ int format_input_command(char command[]) {
     char *end_ptr, *enter_ptr;
     ptrdiff_t defference;
 
-    printf(">> ");
+    printf("\n>> ");
     fgets(command, COMMAND_SIZE, stdin);
     if (command[0] == '\n')
         return 6;
@@ -43,7 +45,7 @@ int format_input_command(char command[]) {
     strcpy(command_cpy, command); // 不改变原参数而需要复制，前面已经保证了此处字符串可以装的下
     temp_ptr = strchr(command_cpy, '('); // find command string
     if (temp_ptr == NULL) {
-        wrong_print(command_cpy, command_cpy, "\nThis is the first error for this string: \n");
+        wrong_print(command_cpy, command_cpy, "This string have some error:");
         return 0;
     }
     else
@@ -56,7 +58,7 @@ int format_input_command(char command[]) {
     else if (strcmp(COMP_STR, command_cpy) == 0)
         type = 3;
     else {
-        wrong_print(command_cpy, command_cpy, "\nThis is the first error for this string: \n");
+        wrong_print(command_cpy, command_cpy, "This string have some error:");
         return 0;
     }
     *temp_ptr = '('; // 恢复先
@@ -85,7 +87,7 @@ int format_input_command(char command[]) {
         if (arg_mode == 0)
             return 0;
         else if (arg_mode == 1) {
-            wrong_print(command, temp_ptr + 1, "\nThis is the first error for this string: \n");
+            wrong_print(command, temp_ptr + 1, "This string have some error:");
             return 0;
         }
         else if (arg_mode == 2)
@@ -95,7 +97,7 @@ int format_input_command(char command[]) {
     }
 
     printf("There are some wrongs in this string\n");
-    wrong_print(command, command, "\nThis is the first error for this string: \n");
+    wrong_print(command, command, "This string have some error:");
     return 0;
 }
 
@@ -107,7 +109,7 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
 
     first_comma = strchr(left_bracket, ',');
     if (first_comma == NULL) {
-        wrong_print(command_output, left_bracket + 1, "\nThis is the first error for this string: \n");
+        wrong_print(command_output, left_bracket + 1, "This string have some error:");
         return 0;
     }
 
@@ -115,14 +117,14 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
     if (second_comma == NULL) { // 此时可能是两个参数(一个逗号)
         end_bracket = strchr(first_comma, ')');
         if (end_bracket == NULL) {
-            wrong_print(command_output, first_comma + 1, "\nThis is the first error for this string: \n");
+            wrong_print(command_output, first_comma + 1, "This string have some error:");
             return 0;
         }
         else {
             if (*(end_bracket + 1) == '\0')
                 return 1;
             else {
-                wrong_print(command_output, end_bracket + 1, "\nThis is the first error for this string: \n");
+                wrong_print(command_output, end_bracket + 1, "This string have some error:");
                 return 0;
             }
         }
@@ -130,14 +132,14 @@ int format_argument_char(const char* command_output, const char* left_bracket) {
     else { // 可能是三个参数(两个逗号)
         end_bracket = strchr(second_comma, ')');
         if (end_bracket == NULL) {
-            wrong_print(command_output, second_comma + 1, "\nThis is the first error for this string: \n");
+            wrong_print(command_output, second_comma + 1, "This string have some error:");
             return 0;
         }
         else {
             if (*(end_bracket + 1) == '\0')
                 return 2;
             else {
-                wrong_print(command_output, end_bracket + 1, "\nThis is the first error for this string: \n");
+                wrong_print(command_output, end_bracket + 1, "This string have some error:");
                 return 0;
             }
         }
@@ -168,17 +170,17 @@ int format_math_argument(const char command[], int mode) {
         initialize_token(exp_token); // reset
         initialize_token(exp_postfix);
 
-        exp_token_num = identify_token(expression, exp_token); // convert to token and check
+        exp_token_num = identify_token(expression, exp_token, command); // convert to token and check
         if (exp_token_num == 0)
             return 0;
         print_token(exp_token, exp_token_num);
 
-        exp_postfix_num = infix_to_postfix(exp_token, exp_token_num, exp_postfix); // create postfix and check
+        exp_postfix_num = infix_to_postfix(exp_token, exp_token_num, exp_postfix, command); // create postfix and check
         if (exp_postfix_num == 0)
             return 0;
         print_token(exp_postfix, exp_postfix_num);
 
-        exp_root = convert_tree(exp_postfix, exp_postfix_num); // creat expression tree and check
+        exp_root = convert_tree(exp_postfix, exp_postfix_num, command); // creat expression tree and check
         if (exp_root == NULL)
             return 0;
 
@@ -186,7 +188,7 @@ int format_math_argument(const char command[], int mode) {
         break;
     }
     destroy_tree(exp_root);
-    buffer_clear("buffer_clear(): test"); // testest
+    return 1; // testest
 
     switch (mode) {
     case 1:

@@ -9,14 +9,14 @@ TreeNode* a_node(int type);
 TreeNode* link_node(TreeNode* left_leaf, TreeNode* right_leaf);
 void destroy_tree(TreeNode* root);
 
-int identify_token(const char* exp, Token* token) {
+int identify_token(const char* exp, Token* token, const char* comm) {
     char copy_exp[COMMAND_SIZE];
 
     /* simple check expression string */
     strcpy(copy_exp, exp);
     ptrdiff_t length = strchr(copy_exp, '\0') - copy_exp; // comput length of exp
     if (length < 3) {
-        wrong_print(copy_exp, copy_exp, "-=-= Too short =-=-");
+        wrong_print(comm, strchr(comm, '(') + 1, "-=-= Too short =-=-");
         return 0;
     }
 
@@ -43,8 +43,7 @@ int identify_token(const char* exp, Token* token) {
                     i++;
                 }
                 else {
-                    wrong_print(copy_exp, current_ch, "-=-= Only [x] or [number] are allowed after the first [-] =-=-");
-                    buffer_clear(NULL);
+                    wrong_print(comm, strchr(comm, '(') + 1, "-=-= Only [x] or [number] are allowed after the first [-] =-=-");
                     return 0;
                 }
                 continue; // jump to next loop
@@ -67,8 +66,7 @@ int identify_token(const char* exp, Token* token) {
                 continue;
             }
             else {
-                wrong_print(copy_exp, current_ch, "-=-= buffer_clear() find some mistakes, Enter to clear =-=-");
-                buffer_clear(NULL);
+                wrong_print(comm, strchr(comm, '(') + 1, "-=-= buffer_clear() find some mistakes, Enter to clear =-=-");
                 return 0;
             }
         }
@@ -81,14 +79,12 @@ int identify_token(const char* exp, Token* token) {
 
     /* conbine first '-' and next term, number of token must be odd */
     if (i % 2 == 0) {
-        wrong_print(copy_exp, copy_exp, "-=-= Number of character error =-=-");
-        buffer_clear(NULL);
+        wrong_print(comm, strchr(comm, '(') + 1, "-=-= Number of character error =-=-");
         return 0;
     }
 
     if (token[i - 1].isoperator == 't' && token[i - 1].operator != ')') {
-        wrong_print(copy_exp, strchr(copy_exp, '\0') - 1, "-=-= Final symbol must be [number] or not-[operator] =-=-");
-        buffer_clear(NULL);
+        wrong_print(comm, strchr(comm, '(') + 1, "-=-= Final symbol must be [number] or not-[operator] =-=-");
         return 0;
     }
 
@@ -128,7 +124,7 @@ int need_pop(const char* stack, int j, char curr_operator) { // j--回到栈顶�
     return i - 1;
 }
 
-int infix_to_postfix(const Token* token, int token_num, Token* postfix) {
+int infix_to_postfix(const Token* token, int token_num, Token* postfix, const char* comm) {
     int i, j, k, need_num;
     int door = 1;
     char operator_stack[COMMAND_SIZE] = {'\0'};
@@ -202,7 +198,7 @@ int infix_to_postfix(const Token* token, int token_num, Token* postfix) {
     return k;
 }
 
-TreeNode* convert_tree(const Token* postfix, int num) {
+TreeNode* convert_tree(const Token* postfix, int num, const char* comm) {
     int top_up = 0;
     TreeNode* stack[COMMAND_SIZE];
     TreeNode* current;

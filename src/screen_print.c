@@ -20,6 +20,8 @@ void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_
 
     if (print_str != NULL)
         printf("%s\n", print_str);
+    else
+        putchar('\n');
     table((int)length + 2, '/', '=', '\\');
     putchar(' ');
     printf(wrong_str);
