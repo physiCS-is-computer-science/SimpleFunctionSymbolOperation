@@ -3,11 +3,9 @@
 #include <string.h>
 
 void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
-
 int identify_token(const char* exp, Token* token, const char* comm);
 int infix_to_postfix(const Token* token, int token_num, Token* postfix, const char* comm);
 TreeNode* convert_tree(const Token* postfix, int num, const char* comm);
-
 void destroy_tree(TreeNode* root);
 void initialize_token(Token* token);
 void print_token(const Token* token, int size);
@@ -188,6 +186,7 @@ int format_math_argument(const char command[], int mode) {
         break;
     }
     destroy_tree(exp_root);
+
     return 1; // testest
 
     switch (mode) {
