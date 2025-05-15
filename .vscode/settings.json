@@ -29,7 +29,8 @@
                     "storage.type", // int/char/float 等类型关键字
                     "meta.preprocessor.keyword", // #include/#define 等预处理关键字
                     "variable.parameter", // 函数参数
-                    "string" // 字符串
+                    "string", // string
+                    "entity.name.function"
                 ],
                 "settings": {
                     "fontStyle": "italic"
