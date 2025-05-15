@@ -4,8 +4,8 @@
 #include <string.h>
 
 TreeNode* link_node(TreeNode* left_leaf, TreeNode* right_leaf);
-void destroy_tree(TreeNode* root);
 TreeNode* a_node(int type);
+void destroy_tree(TreeNode* root);
 
 int identify_token(const char* exp, Token* token, const char* comm) {
     char copy_exp[COMMAND_SIZE];
