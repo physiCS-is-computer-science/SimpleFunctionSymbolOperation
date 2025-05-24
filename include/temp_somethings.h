@@ -1,4 +1,4 @@
-/* storage temprory macros */
+/* storage temprory macros and another things */
 
 #pragma once
 
@@ -32,5 +32,5 @@ typedef struct ExpressionTerm { // true is not-'\0', false is '\0'
     int num;
 } Token;
 
-void buffer_clear(char* screen_print);
-void wrong_print(const char* wrong_str, const char* first_wrong_ch, char* print_str);
+void bufferClear(char* screenPrint);
+void wrongPrint(const char* wrongStr, const char* firstWrongCh, char* printStr);

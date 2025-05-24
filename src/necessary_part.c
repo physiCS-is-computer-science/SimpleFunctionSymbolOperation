@@ -7,13 +7,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void __process_quit_getchar(void) {
+void __processQuitGetchar(void) {
     printf("-=-= Enter to end the process =-=-");
     getchar();
     exit(0);
 }
 
-void __f5_stop_getchar(void) {
+void __f5StopGetchar(void) {
     printf("\n-=-=-= Process has ended, press key Enter to close it =-=-=-");
     getchar();
 }
@@ -38,19 +38,19 @@ void __printer1(int a) {
     }
 }
 
-void buffer_clear(char* screen_print) {
-    if (screen_print != NULL) {
-        printf("%s", screen_print);
+void bufferClear(char* screenPrint) {
+    if (screenPrint != NULL) {
+        printf("%s", screenPrint);
     }
     while (getchar() != '\n')
         continue;
 }
 
-void destroy_tree(TreeNode* root) {
+void destroyTree(TreeNode* root) {
     if (root == NULL)
         return;
-    destroy_tree(root->left);
-    destroy_tree(root->right);
+    destroyTree(root->left);
+    destroyTree(root->right);
 
     if (root->is_operand == 't')
         printf("freedom '%d'\n", root->operand);
@@ -62,15 +62,15 @@ void destroy_tree(TreeNode* root) {
     free(root);
 }
 
-TreeNode* link_node(TreeNode* left_leaf, TreeNode* right_leaf) {
+TreeNode* linkNode(TreeNode* leftLeaf, TreeNode* rightLeaf) {
     TreeNode* current = (TreeNode*)malloc(sizeof(TreeNode));
-    current->left = left_leaf;
-    current->right = right_leaf;
+    current->left = leftLeaf;
+    current->right = rightLeaf;
     return current;
 }
 
 /* 创建左右树叶指向NULL的节点 */
-TreeNode* a_node(int type) {
+TreeNode* aNode(int type) {
     TreeNode* node;
     node = (TreeNode*)malloc(sizeof(TreeNode));
     if (type == 1) { // num
@@ -90,7 +90,7 @@ TreeNode* a_node(int type) {
     }
     else {
         free(node);
-        buffer_clear("-=-= a_node(): No expected parameters was =-=-");
+        bufferClear("-=-= aNode(): No expected parameters was =-=-");
         return NULL;
     }
     node->left = NULL;
