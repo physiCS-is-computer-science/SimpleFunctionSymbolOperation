@@ -3,7 +3,7 @@
  * function _xxx() is temprory test function that will be deleted
  */
 
-#include "temp_somethings.h"
+#include "temp.h"
 #include <stdio.h>
 #include <stdlib.h>
 
