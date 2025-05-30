@@ -2,13 +2,56 @@
 #include <stdio.h>
 #include <string.h>
 
-int identifyToken(const char* exp, Token* token, const char* comm);
 int infixToPostfix(const Token* token, int tokenNum, Token* postfix, const char* comm);
 TreeNode* convertTree(const Token* postfix, int num, const char* comm);
 void destroyTree(TreeNode* root);
 void initializeToken(Token* token);
 void printToken(const Token* token, int size);
-int formatArgumentChar(const char* commandInput, const char* leftBracket);
+
+/* return mode: 0-wrong 1-non-number-mode 2-number-mode
+ * 仅仅检查：命令正确、拥有左括号 的字符串。检查其括号是否闭合，如果闭合，则保证括号内有 1~2 个及以上个数逗号
+ * 可能要重写 */
+int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
+    char *firstComma, *secondComma, *endBracket;
+
+    firstComma = strchr(leftBracket, ',');
+    if (firstComma == NULL) {
+        wrongPrint(commandOutput, leftBracket + 1, "This string have some error:");
+        return 0;
+    }
+
+    secondComma = strchr(firstComma + 1, ',');
+    if (secondComma == NULL) { // 此时可能是两个参数(一个逗号)
+        endBracket = strchr(firstComma, ')');
+        if (endBracket == NULL) {
+            wrongPrint(commandOutput, firstComma + 1, "This string have some error:");
+            return 0;
+        }
+        else {
+            if (*(endBracket + 1) == '\0')
+                return 1;
+            else {
+                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
+                return 0;
+            }
+        }
+    }
+    else { // 可能是三个参数(两个逗号)
+        endBracket = strchr(secondComma, ')');
+        if (endBracket == NULL) {
+            wrongPrint(commandOutput, secondComma + 1, "This string have some error:");
+            return 0;
+        }
+        else {
+            if (*(endBracket + 1) == '\0')
+                return 2;
+            else {
+                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
+                return 0;
+            }
+        }
+    }
+}
 
 /* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析 */
 int formatInputCommand(char command[]) {
@@ -97,50 +140,6 @@ int formatInputCommand(char command[]) {
     return 0;
 }
 
-/* return mode: 0-wrong 1-non-number-mode 2-number-mode
- * 仅仅检查：命令正确、拥有左括号 的字符串。检查其括号是否闭合，如果闭合，则保证括号内有 1~2 个及以上个数逗号
- * 可能要重写 */
-int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
-    char *firstComma, *secondComma, *endBracket;
-
-    firstComma = strchr(leftBracket, ',');
-    if (firstComma == NULL) {
-        wrongPrint(commandOutput, leftBracket + 1, "This string have some error:");
-        return 0;
-    }
-
-    secondComma = strchr(firstComma + 1, ',');
-    if (secondComma == NULL) { // 此时可能是两个参数(一个逗号)
-        endBracket = strchr(firstComma, ')');
-        if (endBracket == NULL) {
-            wrongPrint(commandOutput, firstComma + 1, "This string have some error:");
-            return 0;
-        }
-        else {
-            if (*(endBracket + 1) == '\0')
-                return 1;
-            else {
-                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
-                return 0;
-            }
-        }
-    }
-    else { // 可能是三个参数(两个逗号)
-        endBracket = strchr(secondComma, ')');
-        if (endBracket == NULL) {
-            wrongPrint(commandOutput, secondComma + 1, "This string have some error:");
-            return 0;
-        }
-        else {
-            if (*(endBracket + 1) == '\0')
-                return 2;
-            else {
-                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
-                return 0;
-            }
-        }
-    }
-}
 
 /* 格式正确返回 1，错误返回 0 */
 int formatMathArgument(const char command[], int mode) {

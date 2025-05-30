@@ -3,8 +3,6 @@
 #include <string.h>
 #include <windows.h>
 
-static void table(int length, char left, char middle, char right);
-
 static void table(int length, char left, char middle, char right) {
     putchar(left);
     for (int i = 1; i <= length - 2; i++)
