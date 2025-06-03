@@ -33,4 +33,4 @@ typedef struct ExpressionTerm { // true is not-'\0', false is '\0'
 } Token;
 
 void bufferClear(char* screenPrint);
-void wrongPrint(const char* wrongStr, const char* firstWrongCh, char* printStr);
+void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* printStr);

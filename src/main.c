@@ -29,15 +29,17 @@
 #include <stdlib.h>
 
 void mainMenu(void);
-int formatMathArgument(const char command[], int mode); // check the argument of command, return 1/0
+TreeNode* formatMathArgument(const char command[], int mode); // check the argument of command, return 1/0
 int formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
+void destroyTree(TreeNode* root);
 void __processQuitGetchar(void);
 void __f5StopGetchar(void);
 void __printer1(int a);
 
 int main(void) {
-    int commandType, isFormat;
     char inputCommand[COMMAND_SIZE];
+    int commandType;
+    TreeNode* isFormat = NULL;
 
     while (1) {
         mainMenu();
@@ -47,46 +49,38 @@ int main(void) {
          * function formatInputCommand() ensure the string of inputCommand[] must be like : correctCommand(,,)
          * 然而只保证括号闭合时至少 1~2 个逗号，大于2个逗号时，如果括号闭合，检测不出问题
          * arguments analysis moduel，对命令的参数进一步分析，补全 formatInputCommand() 函数的问题
-         * 此部分需要与 lexical_analysis.c 模块结合，识别到参数与数学含义相对应为止，绝非简单检查逗号数量或者参数是否为空 */
+         * 此部分需要与 lexicon_analysis.c 模块结合，识别到参数与数学含义相对应为止，绝非简单检查逗号数量或者参数是否为空 */
         while (1) {
             commandType = formatInputCommand(inputCommand);
 
-            if (commandType == 0) {
+            if (commandType == 0)
                 continue;
-            }
             else if (commandType == 6) { // enter to quit
                 __f5StopGetchar(); // sb vscode terminal
-                exit(0);
+                return 0;
             }
-            else if (commandType >= 1 && commandType <= 5) { // identify the command mode
+            else if (commandType >= 1 && commandType <= 5) // identify the command mode
                 isFormat = formatMathArgument(inputCommand, commandType);
-                if (isFormat)
-                    break;
-            }
+
+            if (isFormat)
+                break;
         }
+
         __printer1(commandType);
-
+        destroyTree(isFormat); // testest
         bufferClear("-=-= testest =-=-"); // test
-
-        // /* COMPUTE MODULE */
-        // switch (commandType) {
-        // case 1:
-        //     struct diff(inputCommand);
-        //     break;
-        // case 2:
-        //     struct diff_num(inputCommand);
-        //     break;
-        // case 3:
-        //     struct inte(inputCommand);
-        //     break;
-        // case 4:
-        //     struct inte_num(inputCommand);
-        //     break;
-        // case 5:
-        //     strcut compute(inputCommand);
-        //     break;
-        // }
     }
+
+    /* Compute module */
+    switch (commandType) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    }
+
+    return 0;
 }
 
 /* ⣀⣆⣰⣒⣒⡀⢀⠔⠠⠤⡦⠤⠄⢴⠤⠤⠤⢴⠄
