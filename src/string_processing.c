@@ -7,6 +7,7 @@ TreeNode* convertTree(const Token* postfix, int num, const char* comm);
 void destroyTree(TreeNode* root);
 void initializeToken(Token* token);
 void printToken(const Token* token, int size);
+int identifyToken(const char* exp, Token* token, const char* comm);
 
 /* return mode: 0-wrong 1-non-number-mode 2-number-mode
  * 仅仅检查：命令正确、拥有左括号 的字符串。检查其括号是否闭合，如果闭合，则保证括号内有 1~2 个及以上个数逗号
@@ -140,7 +141,6 @@ int formatInputCommand(char command[]) {
     return 0;
 }
 
-
 /* 格式正确返回 1，错误返回 0 */
 int formatMathArgument(const char command[], int mode) {
     TreeNode* expRoot;
@@ -157,8 +157,7 @@ int formatMathArgument(const char command[], int mode) {
     *strchr(expression, ',') = '\0';
 
     /* identify the/first(mode5 have 2 expresion) expression
-     * input and convert infix expression to token,
-     * and check the expression tree times */
+     * input and convert infix expression to token, and check the expression tree times */
     int expTokenNum, expPostfixNum;
     Token expToken[COMMAND_SIZE], expPostfix[COMMAND_SIZE];
     while (1) {

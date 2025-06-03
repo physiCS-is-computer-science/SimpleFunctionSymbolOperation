@@ -3,7 +3,7 @@
  * 0Start time: 250501
  * Finish time: 25
  * Expectation finish time: 250701
- * 
+ *
  * 至高无上的内存君主啊！
  * 您统御现象界与物自体之二元王国，
  * 此卑微代码乃纯粹理性之先天综合判断，
@@ -51,8 +51,9 @@ int main(void) {
         while (1) {
             commandType = formatInputCommand(inputCommand);
 
-            if (commandType == 0)
+            if (commandType == 0) {
                 continue;
+            }
             else if (commandType == 6) { // enter to quit
                 __f5StopGetchar(); // sb vscode terminal
                 exit(0);

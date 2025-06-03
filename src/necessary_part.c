@@ -52,12 +52,14 @@ void destroyTree(TreeNode* root) {
     destroyTree(root->left);
     destroyTree(root->right);
 
+    /* -=-=-=-=-= StartTest =-=-=-=-=- */
     if (root->is_operand == 't')
         printf("freedom '%d'\n", root->operand);
     if (root->is_operator == 't')
         printf("freedom '%c'\n", root->operator);
     if (root->is_x == 't')
         printf("freedom '%s'\n", root->x);
+    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     free(root);
 }
@@ -69,7 +71,7 @@ TreeNode* linkNode(TreeNode* leftLeaf, TreeNode* rightLeaf) {
     return current;
 }
 
-/* 创建左右树叶指向NULL的节点 */
+/* 创建左右树叶儿子都指向NULL的节点 */
 TreeNode* aNode(int type) {
     TreeNode* node;
     node = (TreeNode*)malloc(sizeof(TreeNode));
