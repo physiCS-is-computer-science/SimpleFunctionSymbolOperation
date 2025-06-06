@@ -2,12 +2,11 @@
 #include <stdio.h>
 #include <string.h>
 
-int infixToPostfix(const Token* token, int tokenNum, Token* postfix, const char* comm);
-TreeNode* convertTree(const Token* postfix, int num, const char* comm);
-void destroyTree(TreeNode* root);
-void initializeToken(Token* token);
+void destroyTree(Tree* root);
 void printToken(const Token* token, int size);
-int identifyToken(const char* exp, Token* token, const char* comm);
+void expPrint(const char exp[]);
+
+char* expCorrect(char exp[]);
 
 /* return mode: 0-wrong 1-non-number-mode 2-number-mode
  * 仅仅检查：命令正确、拥有左括号 的字符串。
@@ -55,7 +54,9 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     }
 }
 
-/* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析 */
+/* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析
+ * function formatInputCommand() ensure the string of inputCommand[] must be like : correctCommand(,,)
+ * 然而只保证括号闭合时至少 1~2 个逗号，大于2个逗号时，如果括号闭合，检测不出问题 */
 int formatInputCommand(char command[]) {
     char *endPtr, *enterPtr; // enterPtr point to '\n' at the end of the command string
     ptrdiff_t difference;
@@ -138,11 +139,18 @@ int formatInputCommand(char command[]) {
     return 0;
 }
 
-/* 格式正确返回 1，错误返回 0 */
-TreeNode* formatMathArgument(const char command[], int mode) {
-    TreeNode* expRoot;
+/* 格式正确返回 root，错误返回 NULL
+ * 0.command string -> expression
+ * 1.expression -> string
+ * 2.string -> newString (rule 2)
+ * 3.newString -> tokens (~a -> (0-a))
+ * 4.tokens -> postfix
+ * 5.postfix -> tree
+ * return root of the expression tree at the end of function 'formatMathArgument()'
+ * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
+Tree* formatMathArgument(const char command[], int mode) {
     char* expStart;
-    char expression[COMMAND_SIZE];
+    char expression[COMMAND_SIZE] = {'\0'};
 
     expStart = strchr(command, '(');
     expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险
@@ -150,38 +158,24 @@ TreeNode* formatMathArgument(const char command[], int mode) {
         wrongPrint(command, expStart, "-=-= The expression is not exist =-=-");
         return NULL;
     }
-    strcpy(expression, expStart); // expStart is the next pointer of '('
-    *strchr(expression, ',') = '\0';
-
-    /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    /* -=-=-=-=-= StartTest =-=-=-=-=- */
+    ptrdiff_t diff = strchr(expStart, ',') - expStart;
+    strncpy(expression, expStart, (int)diff); // expStart is the next pointer of '('
 
     /* use lexicon_analysis module to identify the/first(mode5 have 2 expresion) expression
      * input and convert infix expression to token, and check the expression tree times */
-    int expTokenNum, expPostfixNum;
-    Token expToken[COMMAND_SIZE], expPostfix[COMMAND_SIZE];
-
-    initializeToken(expToken); // reset
-    initializeToken(expPostfix);
-
-    expTokenNum = identifyToken(expression, expToken, command); // convert to token and check
-    if (expTokenNum == 0)
+    /* 2.字符串查错 */
+    if (expCorrect(expression) == FALSE_CH)
         return NULL;
-    printToken(expToken, expTokenNum);
+    expPrint(expression); // test
 
-    expPostfixNum = infixToPostfix(expToken, expTokenNum, expPostfix, command); // create postfix and check
-    if (expPostfixNum == 0)
-        return NULL;
-    printToken(expPostfix, expPostfixNum);
+    /* 3.expression -> tokens(~a -> (0-a)) */
 
-    expRoot = convertTree(expPostfix, expPostfixNum, command); // creat expression tree and check
-    if (expRoot == NULL)
-        return NULL;
+    /* 4.tokens ->postfix */
 
-    bufferClear("Enter to close the process"); // testest
+    /* 5.postfix -> tree */
 
-    return expRoot; // testest
-
-    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
+    /* -=-=-=-=-= StartTest =-=-=-=-=- */
+    Tree* retTest;
+    return retTest;
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 }

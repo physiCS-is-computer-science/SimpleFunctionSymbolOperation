@@ -11,6 +11,19 @@ static void table(int length, char left, char middle, char right) {
     putchar('\n');
 }
 
+/* help to choose module */
+void mainMenu(void) {
+    system("cls");
+    table(44, '+', '-', '+');
+    printf(" 1.diff(function, order)\n");
+    printf(" 2.diff(function, order, num)\n");
+    printf(" 3.inte(funcion, order)\n");
+    printf(" 4.inte(function, order, [left, right])\n");
+    printf(" 5.comp(function1, function2, operator)\n");
+    printf(" 6.Enter to quit\n");
+    table(44, '+', '-', '+');
+}
+
 /* 传递错误字符串指针、错误字符指针，做差标识出第一个错误处 */
 void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* printStr) {
     ptrdiff_t length = strchr(wrongStr, '\0') - wrongStr;
@@ -34,31 +47,20 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
     table((int)length + 2, '=', '=', '=');
 }
 
-/* help to choose module */
-void mainMenu(void) {
-    system("cls");
+// void printToken(const Token* token, int size) {
+//     for (int i = 0; i < size; i++) {
+//         if (token[i].isnum == 't')
+//             printf("'%d' ", token[i].num);
+//         else if (token[i].isoperator == 't')
+//             printf("'%c' ", token[i].operator);
+//         else if (token[i].isvariable == 't')
+//             printf("'%s' ", token[i].variable);
+//     }
+//     putchar('\n');
+// }
 
-    table(44, '+', '-', '+');
-    printf(" 1.diff(function, order)\n");
-    printf(" 2.diff(function, order, num)\n");
-    printf(" 3.inte(funcion, order)\n");
-    printf(" 4.inte(function, order, [left, right])\n");
-    printf(" 5.comp(function1, function2, operator)\n");
-    printf(" 6.Enter to quit\n");
-    table(44, '+', '-', '+');
-}
-
-void printToken(const Token* token, int size) {
-    for (int i = 0; i < size; i++) {
-        if (token[i].isnum == 't') {
-            printf("'%d' ", token[i].num);
-        }
-        else if (token[i].isoperator == 't') {
-            printf("'%c' ", token[i].operator);
-        }
-        else if (token[i].isvariable == 't') {
-            printf("'%s' ", token[i].variable);
-        }
-    }
+void expPrint(const char exp[]) {
+    for (int i = 0; exp[i] != '\0'; i++)
+        printf("%c ", exp[i]);
     putchar('\n');
 }

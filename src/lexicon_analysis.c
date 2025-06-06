@@ -1,244 +1,197 @@
+/***
+ * Rules in the module of "2.string -> newString":
+ * 0.number of '(' and ')' % 2
+ *   if != 0 -> wP
+ * 1.number of '-' % 2
+ *   if it is odd: -> '-'
+ *   if it is even:-> '+'
+ *   if "++++...": -> '+'
+ * 2.
+ *   2.1.unary '-':
+ *     if exp[0] == '-': -> '~'
+ *     if have "/^*(" in the left of '-': -> '~'
+ *   2.2.unary '+':
+ *     if exp[0] == '+': -> ' '
+ *     if have "/^*(" in the left of '+': -> ' '
+ * 3./ 和 * 左边一定为 num，右边一定为 num 或 '~'，否则 -> wP
+ *   if /0: -> wP
+ * 4.遍历一遍找非"+-/^*~() 1234567890"的字符
+ */
+
 #include "temp.h"
-#include <ctype.h>
-#include <stdlib.h>
 #include <string.h>
 
-TreeNode* linkNode(TreeNode* leftLeaf, TreeNode* rightLeaf);
-TreeNode* aNode(int type);
-void destroyTree(TreeNode* root);
+char chPush(char stack[], char aim, int size);
+char chPop(char stack[], int size);
+char isChEmpty(char stack[]);
 
-int identifyToken(const char* exp, Token* token, const char* comm) {
-    char copyExp[COMMAND_SIZE];
+/* return NULL or pointer start */
+char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
+    if (start > end) // 确保 start 指针不大于 end 指针
+        return NULL;
 
-    /* simple check expression string */
-    strcpy(copyExp, exp);
-    ptrdiff_t length = strchr(copyExp, '\0') - copyExp; // comput length of exp
-    if (length < 3) {
-        wrongPrint(comm, strchr(comm, '(') + 1, "-=-= Too short =-=-");
-        return 0;
+    if (start == end && *start == '+') // 只有一个 +
+        return start;
+    while (start != end) { // 此处 end 判断不到，因为到 end 就退出循环了
+        if (*start != '+')
+            return NULL;
+        start++;
     }
-
-    /* real check */
-    int i;
-    char *is_operator, *endptr;
-    char* currentCh = copyExp;
-    for (i = 0; *currentCh != '\0'; currentCh++) {
-        is_operator = strchr(TOKEN_SYMBOL, *currentCh); // +-*/^()
-
-        if ((currentCh == copyExp) && (is_operator != NULL)) { // if first element isn't positive
-            if (*is_operator == '-') {
-                currentCh++; // next symbol of '-'
-                if (*currentCh == 'x') {
-                    token[i].isvariable = 't';
-                    strcpy(token[i].variable, "-x");
-                    i++;
-                }
-                else if (isdigit(*currentCh)) { // is num
-                    token[i].isnum = 't';
-                    token[i].num = -(int)strtol(currentCh, &endptr, 10);
-                    currentCh = endptr;
-                    currentCh--;
-                    i++;
-                }
-                else {
-                    wrongPrint(comm, strchr(comm, '(') + 1, "-=-= Only [x] or [number] are allowed after the first [-] =-=-");
-                    return 0;
-                }
-                continue; // jump to next loop
-            }
-        }
-        if (!is_operator) { // is not operator
-            if (*currentCh == 'x') { // is x
-                token[i].isvariable = 't';
-                strcpy(token[i].variable, "x");
-                i++;
-            }
-            else if (isdigit(*currentCh)) { // is num
-                token[i].isnum = 't';
-                token[i].num = (int)strtol(currentCh, &endptr, 10);
-                currentCh = endptr;
-                currentCh--;
-                i++;
-            }
-            else if (*currentCh == ' ') {
-                continue;
-            }
-            else {
-                wrongPrint(comm, strchr(comm, '(') + 1, "-=-= bufferClear() find some mistakes, Enter to clear =-=-");
-                return 0;
-            }
-        }
-        else { // is operator
-            token[i].isoperator = 't';
-            token[i].operator = *is_operator;
-            i++;
-        }
-    }
-
-    /* conbine first '-' and next term, number of token must be odd */
-    if (i % 2 == 0) {
-        wrongPrint(comm, strchr(comm, '(') + 1, "-=-= Number of character error =-=-");
-        return 0;
-    }
-
-    if (token[i - 1].isoperator == 't' && token[i - 1].operator != ')') {
-        wrongPrint(comm, strchr(comm, '(') + 1, "-=-= Final symbol must be [number] or not-[operator] =-=-");
-        return 0;
-    }
-
-    return i;
+    if (*end == '+') // 判断最后一个
+        return start;
+    else
+        return NULL;
 }
 
-void initializeToken(Token* token) {
-    for (int i = 0; i < COMMAND_SIZE; i++) {
-        token[i].isnum = 'f';
-        token[i].isoperator = 'f';
-        token[i].isvariable = 'f';
+void opFill(char* start, char* end, char filler) { // 将这两指针之间填充为 ‘空格’ 和 ‘filler字符’，且filler在 end 处
+    *end = filler;
+    if (start == end) // 一个时
+        return;
+    while (start != end) {
+        *start = ' ';
+        start++;
     }
 }
 
-int level(char operator) {
-    switch (operator) {
-    case '+':
-    case '-':
+int minusNum(const char* start, const char* end) {
+    if (start == end && *start == '-')
         return 1;
-    case '*':
-    case '/':
-        return 2;
-    case '^':
-        return 3;
+
+    int i = 0;
+    while (start != end) {
+        if (*start == '-')
+            i++;
+        start++;
+    }
+    if (*end == '-')
+        return ++i;
+    else
+        return i;
+}
+
+char hasLeft(char exp[], char* op, char* aimStr) { // 判断 op 左边最后一个字符(空格跳过)是否是字符串 aimStr 之一
+    char judge = FALSE_CH;
+    char* currentCh = exp;
+
+    for (; currentCh != op; currentCh++) {
+        if (*currentCh == ' ')
+            continue;
+        if (strchr(aimStr, *currentCh) != NULL)
+            judge = TRUE_CH;
+        else
+            judge = FALSE_CH;
+    }
+
+    return judge;
+}
+
+void chFind(char exp[], char* ops[], char op) {
+    int i = 0;
+    char* currentCh = exp;
+    while (*currentCh != '\0') {
+        if (*currentCh == op)
+            ops[i++] = currentCh;
+        currentCh++;
     }
 }
 
-int needPop(const char* stack, int j, char currOperator) { // j--回到栈顶，currOperator一定是 +-*/^ 之一
-    int i;
-    if (currOperator == '^')
-        return 0;
-    for (i = 1, j--; j >= 0; i++, j--) {
-        if (level(stack[j]) < level(currOperator) || stack[j] == '(')
-            break;
+/* return FALSE_CH or TRUE_CH. The function just check the string of exp out simplely */
+char expCorrect(char exp[]) {
+    /* 0.bracket check */
+    char bracketStack[COMMAND_SIZE] = {'\0'};
+    char* bracketPtr = exp;
+    for (int i = 0; *bracketPtr != '\0'; i++, bracketPtr++) {
+        if (*bracketPtr == '(') {
+            if (chPush(bracketStack, '(', sizeof(bracketStack)) == FALSE_CH) {
+                wrongPrint(exp, bracketPtr, "-=-= Error(chPush()) =-=-");
+                return FALSE_CH;
+            }
+        }
+        else if (*bracketPtr == ')') {
+            if (chPop(bracketStack, sizeof(bracketStack)) == FALSE_CH) {
+                wrongPrint(exp, bracketPtr, "-=-= Error(chPop()) =-=-");
+                return FALSE_CH;
+            }
+        }
+    }
+    if (!isChEmpty(bracketStack)) {
+        wrongPrint(exp, exp, "-=-= The bracket stack should be empty(isChEmpty()) =-=-");
+        return FALSE_CH;
     }
 
-    return i - 1;
-}
-
-int infixToPostfix(const Token* token, int tokenNum, Token* postfix, const char* comm) {
-    int i, j, k, needNum;
-    int door = 1;
-    char operatorStack[COMMAND_SIZE] = {'\0'};
-
-    if (token[0].isoperator == 't' && token[0].operator == '(') // the situation of the first is '('
-        door = 2;
-
-    for (i = 0, j = 0, k = 0; i < tokenNum; i++) {
-        switch (door) {
-        case 1: {
-            if (token[i].isnum == 't' || token[i].isvariable == 't') {
-                postfix[k] = token[i]; // strcture can do this
-                k++;
-                door = 2;
+    /* 1.-+ check */
+    char door = '1';
+    char *opPtr = exp, *isThat = NULL, *opStart = NULL, *opEnd = NULL;
+    for (int i = 0; *opPtr != '\0'; i++, opPtr++) {
+        isThat = strchr("-+", *opPtr); // 遇到 +- 时关上门开下门
+        if (door == '1') {
+            if (isThat) {
+                opStart = opPtr;
+                door = '2';
             }
-            else {
-                bufferClear("-=-= There is a [character] that should be [number] =-=-\n");
-                return 0;
-            }
-            break;
         }
-        case 2: { // 栈序号为栈顶序号下一个
-            if (token[i].isoperator == 't' && token[i].operator == '(') { // 直接入栈
-                operatorStack[j] = token[i].operator;
-                j++;
-                door = 1;
+        else if (door == '2') {
+            if (!isThat) {
+                opEnd = opPtr;
+                opEnd--;
+                door = '3';
             }
-            else if (token[i].isoperator == 't' && token[i].operator == ')') { // 弹出()之间所有操作符
-                for (j--; operatorStack[j] != '('; k++, j--) { // 左j--回到栈顶，循环结束是j为'('，自身即为栈顶的next
-                    postfix[k].isoperator = 't';
-                    postfix[k].operator = operatorStack[j];
-                }
-                door = 2;
-            }
-            else if (token[i].isoperator == 't' && strchr(OPERATOR, token[i].operator)) {
-                needNum = needPop(operatorStack, j, token[i].operator); // 返回需要弹出栈次数
-
-                if (needNum != 0) { // 弹出优先级不高于它的操作符，然后它入栈
-                    j--; // 回栈顶
-                    for (int count = 1; count <= needNum; count++) {
-                        postfix[k].isoperator = 't';
-                        postfix[k].operator = operatorStack[j];
-                        k++;
-                        j--;
-                    }
-                    j++; // 回栈顶的next
-                }
-                operatorStack[j] = token[i].operator; // 入栈
-                j++;
-                door = 1;
-            }
-            else {
-                bufferClear("\n-=-= There is/are (a) [character] that should be [opetator] =-=-");
-                return 0;
-            }
-
-            if (token[i + 1].isoperator == 't' && token[i + 1].operator == '(')
-                door = 2;
-
-            break;
         }
+
+        if (door == '3') {
+            if (isAllPlus(opStart, opEnd))
+                opFill(opStart, opEnd, '+');
+            else if (minusNum(opStart, opEnd) % 2 == 0)
+                opFill(opStart, opEnd, '+');
+            else if (minusNum(opStart, opEnd) % 2 == 1)
+                opFill(opStart, opEnd, '-');
+            door = '1';
         }
     }
 
-    j--; // 回栈顶
-    for (; j >= 0; j--, k++) { // 清空栈
-        postfix[k].isoperator = 't';
-        postfix[k].operator = operatorStack[j];
+    /* 2.unary -+ check */
+    char *unaryMinus[COMMAND_SIZE] = {NULL}, *unaryPlus[COMMAND_SIZE] = {NULL};
+    if (exp[0] == '-')
+        exp[0] = '~';
+    if (exp[0] == '+')
+        exp[0] = ' ';
+
+    chFind(exp, unaryMinus, '-'); // 找到所有的第三参数符号，存储其指针(位于 exp 的指针)到 unaryMinus 数组
+    for (int i = 0; unaryMinus[i] != NULL; i++) {
+        if (hasLeft(exp, unaryMinus[i], "/*^("))
+            *unaryMinus[i] = '~';
+    }
+    chFind(exp, unaryPlus, '+');
+    for (int i = 0; unaryPlus[i] != NULL; i++) {
+        if (hasLeft(exp, unaryPlus[i], "/*^("))
+            *unaryPlus[i] = ' ';
     }
 
-    return k;
-}
-
-TreeNode* convertTree(const Token* postfix, int num, const char* comm) {
-    int topUp = 0;
-    TreeNode* stack[COMMAND_SIZE];
-    TreeNode* current;
-
-    for (int i = 0; i < num; i++, topUp++) { // 1-num 2-x 3-+-*/^ #### topUp++是为了回栈顶下一个
-        if (postfix[i].isnum == 't') {
-            current = aNode(1); // create a node
-            current->operand = postfix[i].num; // initialized it
-            stack[topUp] = current;
+    /* 3.'/' and '*' check
+     * 仅仅检查这两符号左侧最后一个字符是否为 "1234567890x)" 之一(空格不算) */
+    char *allDivision[COMMAND_SIZE] = {NULL}, *allTimes[COMMAND_SIZE] = {NULL};
+    chFind(exp, allDivision, '/');
+    chFind(exp, allTimes, '*');
+    for (int i = 0; allDivision[i] != NULL; i++) {
+        if (!hasLeft(exp, allDivision[i], "1234567890x)")) {
+            wrongPrint(exp, allDivision[i], "-=-= Divisiion error(hasLeft()) =-=-");
+            return FALSE_CH;
         }
-        else if (postfix[i].isvariable == 't') {
-            current = aNode(2);
-            strcpy(current->x, postfix[i].variable); // initialized it, but it is a string("-x\0" or "x\0")
-            stack[topUp] = current;
-        }
-        else if (postfix[i].isoperator == 't') {
-            /* wrong situation */
-            if (topUp < 2) {
-                if (topUp == 0) // stack is empty
-                    bufferClear("-=-= The expression have some problems(stack is empty) =-=-");
-                else if (topUp == 1) {
-                    destroyTree(stack[topUp - 1]);
-                    bufferClear("-=-= The expression have some problems(only one operand left in the stack) =-=-");
-                }
-                return NULL;
-            }
-
-            current = linkNode(stack[topUp - 2], stack[topUp - 1]);
-            current->is_operator = 't'; // initialize
-            current->operator = postfix[i].operator;
-
-            topUp = topUp - 2;
-            stack[topUp] = current;
+    }
+    for (int i = 0; allTimes[i] != NULL; i++) {
+        if (!hasLeft(exp, allTimes[i], "1234567890x)")) {
+            wrongPrint(exp, allTimes[i], "-=-= Times error(hasLeft()) =-=-");
+            return FALSE_CH;
         }
     }
 
-    /* 不知什么情况 */
-    if (topUp != 1) {
-        for (int i = 0; i < num; i++)
-            destroyTree(stack[i]);
-        bufferClear("-=-= The expresion heve some situations =-=-");
+    /* 4.查非法字符(非"1234567890x()+-/^*~") */
+    for (char* currPtr = exp; *currPtr != '\0'; currPtr++) {
+        if (strchr("1234567890x()+-/^*~", *currPtr) == NULL) {
+            wrongPrint(exp, currPtr, " -=-= Illegal characters =-=-");
+            return FALSE_CH;
+        }
     }
 
-    return stack[topUp - 1];
+    return TRUE_CH;
 }
