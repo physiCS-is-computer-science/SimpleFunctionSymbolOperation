@@ -1,4 +1,4 @@
-/*
+/***
  * this part include some important tools
  * function __xxx() is temprory test function that will be deleted
  */
@@ -29,9 +29,8 @@ void __printer1(int a) {
 }
 
 void bufferClear(char* screenPrint) {
-    if (screenPrint != NULL) {
+    if (screenPrint != NULL)
         printf("%s", screenPrint);
-    }
     while (getchar() != '\n')
         continue;
 }
@@ -48,7 +47,7 @@ void destroyTree(Tree* root) {
     if (root->isOp == 't')
         printf("freedom '%c'\n", root->op);
     if (root->isVar == 't')
-        printf("freedom '%s'\n", root->var);
+        printf("freedom '%c'\n", root->var);
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     free(root);
@@ -67,9 +66,8 @@ Tree* aNode(int type) {
 
 /* 四种基本栈操作(char类型栈) */
 char chPush(char stack[], char aim, int size) { // 成功则返回压入字符，失败返回 FALSE_CH
-    int i = 0;
-    while (stack[i] != FALSE_CH) {
-        i++;
+    int i = -1;
+    while (stack[++i] != FALSE_CH) {
         if (i >= size - 1)
             return FALSE_CH;
     }
@@ -114,3 +112,44 @@ char isChEmpty(char stack[]) { // 空栈返回 TRUE_CHAR，非空栈返回 FALSE
 }
 
 /* 四种基本栈操作(Token*类型栈) */
+Token tokenPush(Token stack[], Token aim, int size) {
+}
+Token tokenPop(Token stack[], int size) {
+}
+Token tokenTop(Token stack[], int size) {
+}
+Token isTokenStackEmpty(Token stack[]) { // 判断 token 类型栈是否为空
+}
+
+char isEmptyToken(Token* tmp) { // 判断单个 token 是否为空
+    if (!tmp->isNum && !tmp->isOp && !tmp->isVar)
+        return TRUE_CH;
+    else
+        return FALSE_CH;
+}
+
+void fillChToken(Token* aim, char ch) {
+    if (strchr("x", ch) != NULL) {
+        aim->isVar = TRUE_CH;
+        aim->var = ch;
+    }
+    else {
+        aim->isOp = TRUE_CH;
+        aim->op = ch;
+    }
+}
+
+void fillNumToken(Token* aim, int num) {
+    aim->isNum = TRUE_CH;
+    aim->num = num;
+}
+
+Token* tokenChFind(Token* tokens, char aim) { // max size is COMMAND_SIZE, 找到返回对应 token 地址，没找到返回NULL
+    for (int i = 0; !isEmptyToken(&tokens[i]); i++) {
+        if (tokens[i].isOp && tokens[i].op == aim)
+            return &tokens[i];
+        if (tokens[i].isVar && tokens[i].var == aim)
+            return &tokens[i];
+    }
+    return NULL;
+}

@@ -3,6 +3,8 @@
 #include <string.h>
 #include <windows.h>
 
+char isEmptyToken(Token* tmp);
+
 static void table(int length, char left, char middle, char right) {
     putchar(left);
     for (int i = 1; i <= length - 2; i++)
@@ -26,13 +28,13 @@ void mainMenu(void) {
 
 /* 传递错误字符串指针、错误字符指针，做差标识出第一个错误处 */
 void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* printStr) {
-    ptrdiff_t length = strchr(wrongStr, '\0') - wrongStr;
-    ptrdiff_t deltaLeft = firstWrongCh - wrongStr;
-
     if (printStr != NULL)
         printf("%s\n", printStr);
     else
         putchar('\n');
+
+    ptrdiff_t length = strchr(wrongStr, '\0') - wrongStr;
+    ptrdiff_t deltaLeft = firstWrongCh - wrongStr;
 
     table((int)length + 2, '=', '=', '=');
     putchar(' ');
@@ -47,20 +49,18 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
     table((int)length + 2, '=', '=', '=');
 }
 
-// void printToken(const Token* token, int size) {
-//     for (int i = 0; i < size; i++) {
-//         if (token[i].isnum == 't')
-//             printf("'%d' ", token[i].num);
-//         else if (token[i].isoperator == 't')
-//             printf("'%c' ", token[i].operator);
-//         else if (token[i].isvariable == 't')
-//             printf("'%s' ", token[i].variable);
-//     }
-//     putchar('\n');
-// }
-
-void expPrint(const char exp[]) {
-    for (int i = 0; exp[i] != '\0'; i++)
-        printf("%c ", exp[i]);
+void tokenPrint(Token tokens[]) { // the max size of tokens is COMMAND_SIZE
+    printf("Tokens:\n\t");
+    for (int i = 0; i < COMMAND_SIZE; i++) {
+        if (isEmptyToken(&tokens[i]))
+            break;
+        if (tokens[i].isNum)
+            printf("%d ", tokens[i].num);
+        else if (tokens[i].isOp)
+            printf("%c ", tokens[i].op);
+        else if (tokens[i].isVar)
+            printf("%c ", tokens[i].var);
+    }
+    putchar('\n');
     putchar('\n');
 }

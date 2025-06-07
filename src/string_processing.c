@@ -3,10 +3,11 @@
 #include <string.h>
 
 void destroyTree(Tree* root);
-void printToken(const Token* token, int size);
-void expPrint(const char exp[]);
 
-char* expCorrect(char exp[]);
+char expCorrect(char exp[]);
+char convertToken(char exp[], Token tokens[]); // the size of expTokens and expression is COMMAND_SIZE
+void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
+char tokenCorrect(Token tokens[]); // max size is COMMAND_SIZE
 
 /* return mode: 0-wrong 1-non-number-mode 2-number-mode
  * 仅仅检查：命令正确、拥有左括号 的字符串。
@@ -57,14 +58,14 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
 /* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析
  * function formatInputCommand() ensure the string of inputCommand[] must be like : correctCommand(,,)
  * 然而只保证括号闭合时至少 1~2 个逗号，大于2个逗号时，如果括号闭合，检测不出问题 */
-int formatInputCommand(char command[]) {
+enum CommandType formatInputCommand(char command[]) {
     char *endPtr, *enterPtr; // enterPtr point to '\n' at the end of the command string
     ptrdiff_t difference;
 
     printf("\n>> ");
     fgets(command, COMMAND_SIZE, stdin);
     if (command[0] == '\n') // 直接Enter时
-        return 6;
+        return END;
 
     enterPtr = strchr(command, '\n'); // because fgets() read the character '\n'
     if (enterPtr != NULL)
@@ -76,7 +77,7 @@ int formatInputCommand(char command[]) {
         bufferClear(NULL); // 只有此时才需要 bufferClear()，否则字符串没超过最大限定长度，缓冲区没东西，bufferClear() 导致程序暂停
         printf("\nThe string length has reached the maxium allowable length(%d)", COMMAND_SIZE - 1);
         wrongPrint(command, endPtr, NULL);
-        return 0;
+        return FALSE_INPUT;
     }
 
     /* scan the string of command */
@@ -87,8 +88,8 @@ int formatInputCommand(char command[]) {
     strcpy(commandCpy, command); // 为不改变原参数，因而需要复制，前面已经保证了此处字符串 commandCpy 可以装的下所有字符
     tempPtr = strchr(commandCpy, '('); // find command string
     if (tempPtr == NULL) {
-        wrongPrint(commandCpy, commandCpy, "This string have some errors:");
-        return 0;
+        wrongPrint(commandCpy, commandCpy, "-=-= Command format error =-=-");
+        return FALSE_INPUT;
     }
     else
         *tempPtr = '\0'; // 此时 commandCpy 字符串被截断只剩命令关键字
@@ -100,8 +101,8 @@ int formatInputCommand(char command[]) {
     else if (strcmp(COMP_STR, commandCpy) == 0)
         type = 3;
     else {
-        wrongPrint(commandCpy, commandCpy, "This string have some error:");
-        return 0;
+        wrongPrint(commandCpy, commandCpy, "-=-= Command error =-=-");
+        return FALSE_INPUT;
     }
     *tempPtr = '('; // 恢复先
 
@@ -109,34 +110,34 @@ int formatInputCommand(char command[]) {
     switch (type) {
     case 1: // diff
         if (argMode == 0)
-            return 0;
+            return FALSE_INPUT;
         else if (argMode == 1) // non-number mode
-            return 1;
+            return DIFF_CHAR;
         else if (argMode == 2) // number mode
-            return 2;
+            return DIFF_NUM;
         break;
     case 2: // inte
         if (argMode == 0)
-            return 0;
+            return FALSE_INPUT;
         else if (argMode == 1)
-            return 3;
+            return INTE_CHAR;
         else if (argMode == 2)
-            return 4;
+            return INTE_NUM;
         break;
     case 3: // comp
         if (argMode == 0)
-            return 0;
+            return FALSE_INPUT;
         else if (argMode == 1) {
             wrongPrint(command, tempPtr + 1, "This string have some error:");
-            return 0;
+            return FALSE_INPUT;
         }
         else if (argMode == 2)
-            return 5;
+            return COMP;
         break;
     }
 
     wrongPrint(command, command, "There are some wrongs in this string");
-    return 0;
+    return FALSE_INPUT;
 }
 
 /* 格式正确返回 root，错误返回 NULL
@@ -148,31 +149,50 @@ int formatInputCommand(char command[]) {
  * 5.postfix -> tree
  * return root of the expression tree at the end of function 'formatMathArgument()'
  * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
-Tree* formatMathArgument(const char command[], int mode) {
+Tree* formatMathArgument(const char command[], enum CommandType mode) {
     char* expStart;
     char expression[COMMAND_SIZE] = {'\0'};
 
     expStart = strchr(command, '(');
-    expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险
+    expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险, expStart is the next pointer of '('
     if (*expStart == ',') { // this situation is like: diff(,)
         wrongPrint(command, expStart, "-=-= The expression is not exist =-=-");
         return NULL;
     }
-    ptrdiff_t diff = strchr(expStart, ',') - expStart;
-    strncpy(expression, expStart, (int)diff); // expStart is the next pointer of '('
+    ptrdiff_t diff = strchr(expStart, ',') - expStart; // 找到第一个逗号，diff 一定远小于 COMMAND_SIZE
+    // expression 数组初始化为全 '\0'，因此保证 expression 数组存在 '\0' 来结束字符串(strncpy函数不考虑字符串末尾 '\0')
+    strncpy(expression, expStart, (int)diff);
 
     /* use lexicon_analysis module to identify the/first(mode5 have 2 expresion) expression
      * input and convert infix expression to token, and check the expression tree times */
-    /* 2.字符串查错 */
+    /* 2.string correct */
     if (expCorrect(expression) == FALSE_CH)
         return NULL;
-    expPrint(expression); // test
+    printf("String:\n\t%s\n", expression);
 
-    /* 3.expression -> tokens(~a -> (0-a)) */
+    /* 3.expression -> tokens */
+    Token expTokens[COMMAND_SIZE] = {FALSE_CH}; // initialize
+    if (convertToken(expression, expTokens) == FALSE_CH)
+        return NULL;
+    tokenPrint(expTokens);
+    if (tokenCorrect(expTokens) == FALSE_CH) { // check again just for type of ^-
+        wrongPrint(expression, expression, "-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
+        return NULL;
+    }
 
     /* 4.tokens ->postfix */
+    
 
-    /* 5.postfix -> tree */
+    /* 5.postfix -> tree(~a -> (0-a)) */
+
+    /* select mode */
+    switch (mode) {
+    case DIFF_CHAR:
+    case DIFF_NUM:
+    case INTE_CHAR:
+    case INTE_NUM:
+    case COMP:
+    }
 
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
     Tree* retTest;

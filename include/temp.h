@@ -1,7 +1,8 @@
 /***
  * storage temprory macros and another things
- * true is TRUE_CH('t'), false is FALSE_CH
- *  */
+ * true is TRUE_CH('t'), false is FALSE_CH */
+/* -=-=-=-=-= StartTest =-=-=-=-=- */
+/* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 #pragma once
 
 #define COMMAND_SIZE 100
@@ -23,6 +24,16 @@ typedef struct ExpressionTerm {
     char isVar, isOp, isNum, var, op;
     int num;
 } Token;
+
+enum CommandType {
+    FALSE_INPUT,
+    DIFF_CHAR,
+    DIFF_NUM,
+    INTE_CHAR,
+    INTE_NUM,
+    COMP,
+    END
+};
 
 void bufferClear(char* screenPrint);
 void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* printStr);

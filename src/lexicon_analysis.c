@@ -1,5 +1,5 @@
 /***
- * Rules in the module of "2.string -> newString":
+ * Rules for the expression and tokens:
  * 0.number of '(' and ')' % 2
  *   if != 0 -> wP
  * 1.number of '-' % 2
@@ -19,11 +19,17 @@
  */
 
 #include "temp.h"
+#include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 char chPush(char stack[], char aim, int size);
 char chPop(char stack[], int size);
 char isChEmpty(char stack[]);
+char isEmptyToken(Token* tmp);
+void fillChToken(Token* aim, char ch);
+void fillNumToken(Token* aim, int num);
+Token* tokenChFind(Token* tokens, char aim);
 
 /* return NULL or pointer start */
 char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
@@ -155,7 +161,6 @@ char expCorrect(char exp[]) {
         exp[0] = '~';
     if (exp[0] == '+')
         exp[0] = ' ';
-
     chFind(exp, unaryMinus, '-'); // 找到所有的第三参数符号，存储其指针(位于 exp 的指针)到 unaryMinus 数组
     for (int i = 0; unaryMinus[i] != NULL; i++) {
         if (hasLeft(exp, unaryMinus[i], "/*^("))
@@ -185,13 +190,58 @@ char expCorrect(char exp[]) {
         }
     }
 
-    /* 4.查非法字符(非"1234567890x()+-/^*~") */
+    /* 4.查非法字符(非"1234567890 x()+-/^*~"), 空格为合法字符 */
     for (char* currPtr = exp; *currPtr != '\0'; currPtr++) {
-        if (strchr("1234567890x()+-/^*~", *currPtr) == NULL) {
+        if (strchr("1234567890 x()+-/^*~", *currPtr) == NULL) {
             wrongPrint(exp, currPtr, " -=-= Illegal characters =-=-");
             return FALSE_CH;
         }
     }
 
-    return TRUE_CH;
+    return TRUE_CH; // 全部过时
+}
+
+char convertToken(char exp[], Token tokens[]) { // the size of expTokens and expression is COMMAND_SIZE
+    char *numStart = NULL, *numEnd = NULL;
+    int num, numLength;
+
+    for (int tokenI = 0, expI = 0; tokenI < COMMAND_SIZE - 1; expI++) {
+        char hasUnaryDoor = FALSE_CH;
+
+        if (exp[expI] == FALSE_CH) // '\0'
+            return TRUE_CH;
+        if (exp[expI] == ' ')
+            continue;
+
+        if (strchr("+-*/^~()x", exp[expI]) != NULL) {
+            fillChToken(&tokens[tokenI], exp[expI]);
+            tokenI++;
+        }
+        else if (isdigit(exp[expI])) {
+            numStart = &exp[expI];
+            num = (int)strtol(numStart, &numEnd, 10); // numEnd 是最后一个数字字符的下一个字符
+
+            numLength = (int)(numEnd - numStart);
+            expI = expI + numLength - 1; // 字符串指针偏移量，循环结束后 expI 会自增因此此处减1
+
+            fillNumToken(&tokens[tokenI], num);
+            tokenI++;
+        }
+    }
+
+    return FALSE_CH; // 只要出了循环就算超出
+}
+
+char tokenCorrect(Token tokens[]) { // max size is COMMAND_SIZE，专门检查 ^ 之后是不是 ~
+    Token* current = tokens;
+    while (1) {
+        current = tokenChFind(current, '^');
+        if (current != NULL) {
+            current++;
+            if (current->isOp && current->op == '~')
+                return FALSE_CH;
+        }
+        else
+            return TRUE_CH;
+    }
 }
