@@ -144,9 +144,9 @@ enum CommandType formatInputCommand(char command[]) {
  * 0.command string -> expression
  * 1.expression -> string
  * 2.string -> newString (rule 2)
- * 3.newString -> tokens (~a -> (0-a))
+ * 3.newString -> tokens
  * 4.tokens -> postfix
- * 5.postfix -> tree
+ * 5.postfix -> tree (~a -> (0-a))
  * return root of the expression tree at the end of function 'formatMathArgument()'
  * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
 Tree* formatMathArgument(const char command[], enum CommandType mode) {
@@ -174,14 +174,13 @@ Tree* formatMathArgument(const char command[], enum CommandType mode) {
     Token expTokens[COMMAND_SIZE] = {FALSE_CH}; // initialize
     if (convertToken(expression, expTokens) == FALSE_CH)
         return NULL;
-    tokenPrint(expTokens);
     if (tokenCorrect(expTokens) == FALSE_CH) { // check again just for type of ^-
         wrongPrint(expression, expression, "-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
         return NULL;
     }
+    tokenPrint(expTokens);
 
     /* 4.tokens ->postfix */
-    
 
     /* 5.postfix -> tree(~a -> (0-a)) */
 

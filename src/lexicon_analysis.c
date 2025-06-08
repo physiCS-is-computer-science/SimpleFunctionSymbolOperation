@@ -49,7 +49,7 @@ char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
         return NULL;
 }
 
-void opFill(char* start, char* end, char filler) { // 将这两指针之间填充为 ‘空格’ 和 ‘filler字符’，且filler在 end 处
+void opFill(char* start, char* end, char filler) { // 将这两指针之间填充为 ‘空格’ 和 ‘filler字符’，且 filler 在 end 处
     *end = filler;
     if (start == end) // 一个时
         return;
@@ -128,7 +128,11 @@ char expCorrect(char exp[]) {
     /* 1.-+ check */
     char door = '1';
     char *opPtr = exp, *isThat = NULL, *opStart = NULL, *opEnd = NULL;
-    for (int i = 0; *opPtr != '\0'; i++, opPtr++) {
+
+    for (; *opPtr != '\0'; opPtr++) {
+        if (*opPtr == ' ')
+            continue;
+
         isThat = strchr("-+", *opPtr); // 遇到 +- 时关上门开下门
         if (door == '1') {
             if (isThat) {
@@ -154,6 +158,8 @@ char expCorrect(char exp[]) {
             door = '1';
         }
     }
+    if (isThat) // the situation such as "x----"
+        opFill(opStart, opPtr, ' ');
 
     /* 2.unary -+ check */
     char *unaryMinus[COMMAND_SIZE] = {NULL}, *unaryPlus[COMMAND_SIZE] = {NULL};

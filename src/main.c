@@ -48,32 +48,34 @@ int main(void) {
 
     mainMenu();
 
-    /* string and lexical processing */
-    while (1) {
-        commandType = formatInputCommand(inputCommand);
+    while (1) { // 多个测试用例需要循环，不然重复运行好麻烦，待删除
+        /* string and lexical processing */
+        while (1) {
+            commandType = formatInputCommand(inputCommand);
 
-        if (commandType == FALSE_INPUT)
-            continue;
-        else if (commandType == END) // enter to quit
-            return 0;
-        else if (commandType >= DIFF_CHAR && commandType <= COMP) // identify the command mode
-            isFormat = formatMathArgument(inputCommand, commandType);
-        if (isFormat)
-            break;
-    }
-    /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    __printer1(commandType);
-    // destroyTree(isFormat);
-    bufferClear("-=-= testest =-=-");
-    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
+            if (commandType == FALSE_INPUT)
+                continue;
+            else if (commandType == END) // enter to quit
+                return 0;
+            else if (commandType >= DIFF_CHAR && commandType <= COMP) // identify the command mode
+                isFormat = formatMathArgument(inputCommand, commandType);
+            if (isFormat)
+                break;
+        }
+        /* -=-=-=-=-= StartTest =-=-=-=-=- */
+        __printer1(commandType);
+        // destroyTree(isFormat);
+        bufferClear("-=-= testest =-=-");
+        /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
-    /* Compute module */
-    switch (commandType) {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
+        /* Compute module */
+        switch (commandType) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        }
     }
 
     return 0;
