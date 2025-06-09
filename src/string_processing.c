@@ -4,10 +4,11 @@
 
 void destroyTree(Tree* root);
 
+void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
 char expCorrect(char exp[]);
 char convertToken(char exp[], Token tokens[]); // the size of expTokens and expression is COMMAND_SIZE
-void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
 char tokenCorrect(Token tokens[]); // max size is COMMAND_SIZE
+char tokenToPostfix(Token tokens[], Token postfix[]); // max: COMMAND_SIZE
 
 /* return mode: 0-wrong 1-non-number-mode 2-number-mode
  * 仅仅检查：命令正确、拥有左括号 的字符串。
@@ -168,19 +169,23 @@ Tree* formatMathArgument(const char command[], enum CommandType mode) {
     /* 2.string correct */
     if (expCorrect(expression) == FALSE_CH)
         return NULL;
-    printf("String:\n\t%s\n", expression);
+    printf("String:\n\t%s\n", expression); // test
 
     /* 3.expression -> tokens */
     Token expTokens[COMMAND_SIZE] = {FALSE_CH}; // initialize
-    if (convertToken(expression, expTokens) == FALSE_CH)
+    if (convertToken(expression, expTokens) == FALSE_CH) //  // 确保 token 末尾有空 token 作为结束
         return NULL;
-    if (tokenCorrect(expTokens) == FALSE_CH) { // check again just for type of ^-
-        wrongPrint(expression, expression, "-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
+    if (tokenCorrect(expTokens) == FALSE_CH) // check again just for type of ^-
         return NULL;
-    }
+    /* -=-=-=-=-= StartTest =-=-=-=-=- */
+    printf("Token:\n\t");
     tokenPrint(expTokens);
+    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
-    /* 4.tokens ->postfix */
+    /* 4.tokens -> postfix */
+    Token postfix[COMMAND_SIZE] = {FALSE_CH};
+    if (tokenToPostfix(expTokens, postfix) == FALSE_CH)
+        return NULL;
 
     /* 5.postfix -> tree(~a -> (0-a)) */
 

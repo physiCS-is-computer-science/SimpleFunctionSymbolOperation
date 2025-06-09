@@ -37,8 +37,6 @@ void mainMenu(void);
 Tree* formatMathArgument(const char command[], enum CommandType mode); // check the argument of command, return 1/0
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
 void destroyTree(Tree* root);
-void __processQuitGetchar(void);
-void __f5StopGetchar(void);
 void __printer1(int a);
 
 int main(void) {
@@ -59,6 +57,7 @@ int main(void) {
                 return 0;
             else if (commandType >= DIFF_CHAR && commandType <= COMP) // identify the command mode
                 isFormat = formatMathArgument(inputCommand, commandType);
+
             if (isFormat)
                 break;
         }

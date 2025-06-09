@@ -1,4 +1,7 @@
 /***
+ * 转换为 token 数组时，convertToken()函数确保存储token的数组末尾存在'空token'
+ *   该'空token'确保token数组有结束符(类似'\0')
+ *
  * Rules for the expression and tokens:
  * 0.number of '(' and ')' % 2
  *   if != 0 -> wP
@@ -158,8 +161,10 @@ char expCorrect(char exp[]) {
             door = '1';
         }
     }
-    if (isThat) // the situation such as "x----"
-        opFill(opStart, opPtr, ' ');
+    if (isThat) { // the situation such as "x----"
+        wrongPrint(exp, opStart, "-=-= Illegal end(expCorrect()) =-=-");
+        return FALSE_CH;
+    }
 
     /* 2.unary -+ check */
     char *unaryMinus[COMMAND_SIZE] = {NULL}, *unaryPlus[COMMAND_SIZE] = {NULL};
@@ -211,7 +216,7 @@ char convertToken(char exp[], Token tokens[]) { // the size of expTokens and exp
     char *numStart = NULL, *numEnd = NULL;
     int num, numLength;
 
-    for (int tokenI = 0, expI = 0; tokenI < COMMAND_SIZE - 1; expI++) {
+    for (int tokenI = 0, expI = 0; tokenI < COMMAND_SIZE - 3; expI++) { // 确保 token 末尾有空 token 作为结束
         char hasUnaryDoor = FALSE_CH;
 
         if (exp[expI] == FALSE_CH) // '\0'
@@ -244,10 +249,24 @@ char tokenCorrect(Token tokens[]) { // max size is COMMAND_SIZE，专门检查 ^
         current = tokenChFind(current, '^');
         if (current != NULL) {
             current++;
-            if (current->isOp && current->op == '~')
+            if (current->isOp && current->op == '~') {
+                wrongPrintT(tokens, current, "-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
                 return FALSE_CH;
+            }
         }
         else
             return TRUE_CH;
+    }
+}
+
+char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
+    Token opStack[COMMAND_SIZE] = {FALSE_CH};
+
+    for (int i = 0; i < COMMAND_SIZE; i++) {
+        if (isEmptyToken(&tokens[i]))
+            break;
+
+        if (tokens[i].isNum) {
+        }
     }
 }

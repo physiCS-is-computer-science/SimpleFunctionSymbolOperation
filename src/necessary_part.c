@@ -111,18 +111,60 @@ char isChEmpty(char stack[]) { // 空栈返回 TRUE_CHAR，非空栈返回 FALSE
         return FALSE_CH;
 }
 
-/* 四种基本栈操作(Token*类型栈) */
-Token tokenPush(Token stack[], Token aim, int size) {
-}
-Token tokenPop(Token stack[], int size) {
-}
-Token tokenTop(Token stack[], int size) {
-}
-Token isTokenStackEmpty(Token stack[]) { // 判断 token 类型栈是否为空
-}
-
 char isEmptyToken(Token* tmp) { // 判断单个 token 是否为空
     if (!tmp->isNum && !tmp->isOp && !tmp->isVar)
+        return TRUE_CH;
+    else
+        return FALSE_CH;
+}
+
+/* 四种基本栈操作(Token*类型栈) */
+Token tokenOpPush(Token stack[], Token aim, int size) { // 返回 被压入栈的 token 地址或 NULL
+    int i = -1;
+    Token emptyToken = {FALSE_CH};
+
+    while (!isEmptyToken(&stack[++i])) {
+        if (i >= size - 1)
+            return emptyToken;
+    }
+    stack[i].isOp = TRUE_CH;
+    stack[i].op = aim.op;
+    return stack[i];
+}
+Token tokenOpPop(Token stack[], int size) { // 失败返回空栈，成功弹出并返回栈顶
+    Token emptyToken = {FALSE_CH};
+    if (isEmptyToken(&stack[0])) // 空栈
+        return emptyToken;
+
+    Token top;
+    if (!isEmptyToken(&stack[size - 1])) { // 满栈
+        top = stack[size - 1];
+        stack[size - 1].isOp = FALSE_CH;
+        stack[size - 1].op = FALSE_CH;
+        return top;
+    }
+
+    int i = -1; // 普通情况
+    while (!isEmptyToken(&stack[++i]))
+        continue;
+    top = stack[--i];
+    stack[i].isOp = FALSE_CH;
+    stack[i].op = FALSE_CH;
+    return stack[i];
+}
+Token tokenOpTop(Token stack[], int size) {
+    if (!isEmptyToken(&stack[size - 1])) // 满栈
+        return stack[size - 1];
+    if (isEmptyToken(&stack[0])) // 空栈
+        return stack[0];
+
+    int i = -1; // normal situation
+    while (!isEmptyToken(&stack[++i]))
+        continue;
+    return stack[--i];
+}
+char isTokenOpStackEmpty(Token stack[]) { // 判断 token 类型栈是否为空
+    if (isEmptyToken(&stack[0]))
         return TRUE_CH;
     else
         return FALSE_CH;

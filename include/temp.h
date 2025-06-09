@@ -37,3 +37,4 @@ enum CommandType {
 
 void bufferClear(char* screenPrint);
 void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* printStr);
+void wrongPrintT(const Token* tokens, const Token* firstWrongToken, const char* printStr);
