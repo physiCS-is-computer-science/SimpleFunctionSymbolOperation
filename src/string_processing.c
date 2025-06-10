@@ -193,6 +193,7 @@ Tree* formatMathArgument(const char command[], enum CommandType mode) {
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 5.postfix -> tree(~a -> (0-a)) */
+    
 
     /* select mode */
     switch (mode) {

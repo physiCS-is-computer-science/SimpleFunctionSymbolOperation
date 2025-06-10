@@ -214,6 +214,16 @@ char expCorrect(char exp[]) {
         }
     }
 
+    /* check the final character */
+    char* currPtr = exp;
+    for (; *currPtr != '\0'; currPtr++)
+        continue;
+    currPtr--;
+    if (strchr("+-*/^(", *currPtr) != NULL) {
+        wrongPrint(exp, currPtr, "-=-= Should not be an operator(expCorrect()) =-=-");
+        return FALSE_CH;
+    }
+
     return TRUE_CH; // 全部过时
 }
 
@@ -222,7 +232,6 @@ char convertToken(char exp[], Token tokens[]) { // the size of expTokens and exp
     int num, numLength;
 
     for (int tokenI = 0, expI = 0; tokenI < COMMAND_SIZE - 3; expI++) { // 确保 token 末尾有空 token 作为结束
-        char hasUnaryDoor = FALSE_CH;
 
         if (exp[expI] == FALSE_CH) // '\0'
             return TRUE_CH;
@@ -349,4 +358,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
             }
         }
     }
+
+    wrongPrintT(tokens, tokens, "-=-= Unknown error(tokenToPostfix()) =-=-");
+    return FALSE_CH;
 }
