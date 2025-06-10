@@ -26,13 +26,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-char chPush(char stack[], char aim, int size);
-char chPop(char stack[], int size);
-char isChEmpty(char stack[]);
-char isEmptyToken(Token* tmp);
 void fillChToken(Token* aim, char ch);
 void fillNumToken(Token* aim, int num);
 Token* tokenChFind(Token* tokens, char aim);
+char isEmptyToken(Token* tmp); // 判断单个 token 是否为空
+char chPush(char stack[], char aim, int size);
+char chPop(char stack[], int size);
+char isChEmpty(char stack[]);
+Token tokenOpPush(Token stack[], Token aim, int size); // 返回 被压入栈的 token 地址或 NULL
+Token tokenOpPop(Token stack[], int size); // 失败返回空栈，成功弹出并返回栈顶
+Token tokenOpTop(Token stack[], int size); // 栈顶
+char isTokenOpStackEmpty(Token stack[]); // 判断 token 类型栈是否为空
+int opLevel(char op);
 
 /* return NULL or pointer start */
 char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
@@ -262,11 +267,86 @@ char tokenCorrect(Token tokens[]) { // max size is COMMAND_SIZE，专门检查 ^
 char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
     Token opStack[COMMAND_SIZE] = {FALSE_CH};
 
-    for (int i = 0; i < COMMAND_SIZE; i++) {
-        if (isEmptyToken(&tokens[i]))
-            break;
+    for (int i = 0, j = 0; i < COMMAND_SIZE; i++) {
+        if (tokens[i].isNum || tokens[i].isVar) {
+            postfix[j++] = tokens[i];
+            continue;
+        }
 
-        if (tokens[i].isNum) {
+        /* op */
+        Token tmpToken;
+        if (isTokenOpStackEmpty(opStack) && !isEmptyToken(&tokens[i])) { // 空栈并且非token的结尾时直接入栈
+            tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+            continue;
+        }
+
+        if (tokens[i].op == '(') { // 左括号直接入栈
+            tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+            if (isEmptyToken(&tmpToken)) {
+                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                return FALSE_CH;
+            }
+            continue;
+        }
+
+        if (tokens[i].op == ')') { // 不断弹出直到遇到左括号
+            while (1) { // 出出出出出出出出出出出栈
+                tmpToken = tokenOpPop(opStack, COMMAND_SIZE);
+                if (tmpToken.op == '(' || isEmptyToken(&tmpToken))
+                    break;
+                postfix[j++] = tmpToken; // 写入后缀表达式
+            }
+            continue;
+        }
+
+        Token stackTop = tokenOpTop(opStack, COMMAND_SIZE); // 普通运算符时
+        if (opLevel(stackTop.op) < opLevel(tokens[i].op) && opLevel(tokens[i].op) != -1) { // 1
+            tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+            continue;
+        }
+        if (opLevel(stackTop.op) == opLevel(tokens[i].op) && opLevel(tokens[i].op) != -1) { // 2
+            if (stackTop.op == '^' || stackTop.op == '~') {
+                tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+                continue;
+            }
+
+            while (1) { // 此时为非右结合却相等的运算符，满足压栈条件或者遇到'('停止
+                postfix[j++] = tokenOpPop(opStack, COMMAND_SIZE);
+                stackTop = tokenOpTop(opStack, COMMAND_SIZE); // 弹出操作后的栈顶
+                if (isEmptyToken(&stackTop) || stackTop.op == '(' || opLevel(stackTop.op) < opLevel(tokens[i].op))
+                    break;
+            }
+            tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+            if (isEmptyToken(&tmpToken)) {
+                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                return FALSE_CH;
+            }
+            continue;
+        }
+        if (opLevel(stackTop.op) > opLevel(tokens[i].op) && opLevel(tokens[i].op) != -1) { // 3
+            while (1) { // 满足压栈条件或者遇到'('停止，同上
+                postfix[j++] = tokenOpPop(opStack, COMMAND_SIZE);
+                stackTop = tokenOpTop(opStack, COMMAND_SIZE); // 此栈顶为上一行执行了弹出操作之后的栈顶
+                if (isEmptyToken(&stackTop) || stackTop.op == '(' || opLevel(stackTop.op) < opLevel(tokens[i].op))
+                    break;
+            }
+            tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
+            if (isEmptyToken(&tmpToken)) {
+                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                return FALSE_CH;
+            }
+            continue;
+        }
+
+        if (isEmptyToken(&tokens[i])) { // 'token字符串' 末尾时
+            while (1) { // 出出出出出出出出出出出栈！
+                tmpToken = tokenOpPop(opStack, COMMAND_SIZE); // 弹出
+                if (tmpToken.op == '(' || tmpToken.op == ')') // 表达式读取结束时，栈中仍然存在'('或')'，一定为错误
+                    return FALSE_CH;
+                if (isEmptyToken(&tmpToken)) // 此时不保证完全正确
+                    return TRUE_CH;
+                postfix[j++] = tmpToken;
+            }
         }
     }
 }

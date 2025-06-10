@@ -180,12 +180,17 @@ Tree* formatMathArgument(const char command[], enum CommandType mode) {
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
     printf("Token:\n\t");
     tokenPrint(expTokens);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 4.tokens -> postfix */
     Token postfix[COMMAND_SIZE] = {FALSE_CH};
     if (tokenToPostfix(expTokens, postfix) == FALSE_CH)
         return NULL;
+    /* -=-=-=-=-= StartTest =-=-=-=-=- */
+    printf("Postfix:\n\t");
+    tokenPrint(postfix);
+    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 5.postfix -> tree(~a -> (0-a)) */
 

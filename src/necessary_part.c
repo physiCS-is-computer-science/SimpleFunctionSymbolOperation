@@ -118,8 +118,8 @@ char isEmptyToken(Token* tmp) { // 判断单个 token 是否为空
         return FALSE_CH;
 }
 
-/* 四种基本栈操作(Token*类型栈) */
-Token tokenOpPush(Token stack[], Token aim, int size) { // 返回 被压入栈的 token 地址或 NULL
+/* 四种基本栈操作(存储 op 类型数据的 Token* 类型栈) */
+Token tokenOpPush(Token stack[], Token aim, int size) { // 返回 被压入栈的 token 或 emptyToken
     int i = -1;
     Token emptyToken = {FALSE_CH};
 
@@ -150,7 +150,7 @@ Token tokenOpPop(Token stack[], int size) { // 失败返回空栈，成功弹出
     top = stack[--i];
     stack[i].isOp = FALSE_CH;
     stack[i].op = FALSE_CH;
-    return stack[i];
+    return top;
 }
 Token tokenOpTop(Token stack[], int size) {
     if (!isEmptyToken(&stack[size - 1])) // 满栈
@@ -194,4 +194,17 @@ Token* tokenChFind(Token* tokens, char aim) { // max size is COMMAND_SIZE, 找�
             return &tokens[i];
     }
     return NULL;
+}
+
+int opLevel(char op) {
+    if (op == '+' || op == '-')
+        return 1;
+    else if (op == '*' || op == '/')
+        return 2;
+    else if (op == '~')
+        return 3;
+    else if (op == '^')
+        return 4;
+    else
+        return -1;
 }
