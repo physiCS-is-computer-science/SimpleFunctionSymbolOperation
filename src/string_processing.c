@@ -1,14 +1,28 @@
+/***
+ * 谨以此肺腑诗歌，随我纯粹感恩之心灵，为伟大的 formatMathArgument() 函数而献上！希望这是有效的排列组合于您！
+ * ---
+ * 《圣洁崇高之函数大乐赋》
+ * 吃干营养、汗水、汗水；
+ * 擎起苍穹、迈进、迈进。
+ * 零壹乐谱呼啸逼近！
+ * 冲烂伟大躯壳、
+ * 毁灭内存宫殿。
+ * 赛博蝗灾后是一片废墟，
+ * 站在废墟脚下
+ * 我仍然忠心。
+ */
+
 #include "temp.h"
 #include <stdio.h>
 #include <string.h>
-
-void destroyTree(Tree* root);
 
 void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
 char expCorrect(char exp[]);
 char convertToken(char exp[], Token tokens[]); // the size of expTokens and expression is COMMAND_SIZE
 char tokenCorrect(Token tokens[]); // max size is COMMAND_SIZE
 char tokenToPostfix(Token tokens[], Token postfix[]); // max: COMMAND_SIZE
+Tree* postfixToTree(Token postfix[]);
+void treePrint(Tree* root, int frameDepth);
 
 /* return mode: 0-wrong 1-non-number-mode 2-number-mode
  * 仅仅检查：命令正确、拥有左括号 的字符串。
@@ -19,7 +33,7 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
 
     firstComma = strchr(leftBracket, ',');
     if (firstComma == NULL) {
-        wrongPrint(commandOutput, leftBracket + 1, "This string have some error:");
+        wrongPrint(commandOutput, leftBracket + 1, "\n<<\n-=-= Parameter format error(formatArgumentChar()) =-=-");
         return 0;
     }
 
@@ -27,14 +41,14 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     if (secondComma == NULL) { // 此时可能是两个参数(一个逗号)
         endBracket = strchr(firstComma, ')');
         if (endBracket == NULL) {
-            wrongPrint(commandOutput, firstComma + 1, "This string have some error:");
+            wrongPrint(commandOutput, firstComma + 1, "\n<<\n-=-= End bracket error(formatArgumentChar()) =-=-");
             return 0;
         }
         else {
             if (*(endBracket + 1) == '\0')
                 return 1;
             else {
-                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
+                wrongPrint(commandOutput, endBracket + 1, "\n<<\n-=-= String ending error(formatArgumentChar()) =-=-");
                 return 0;
             }
         }
@@ -42,14 +56,14 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     else { // 可能是三个参数(两个逗号)
         endBracket = strchr(secondComma, ')');
         if (endBracket == NULL) {
-            wrongPrint(commandOutput, secondComma + 1, "This string have some error:");
+            wrongPrint(commandOutput, secondComma + 1, "\n<<\n-=-= End bracket error(formatArgumentChar()) =-=-");
             return 0;
         }
         else {
             if (*(endBracket + 1) == '\0')
                 return 2;
             else {
-                wrongPrint(commandOutput, endBracket + 1, "This string have some error:");
+                wrongPrint(commandOutput, endBracket + 1, "\n<<\n-=-= String ending error(formatArgumentChar()) =-=-");
                 return 0;
             }
         }
@@ -63,7 +77,7 @@ enum CommandType formatInputCommand(char command[]) {
     char *endPtr, *enterPtr; // enterPtr point to '\n' at the end of the command string
     ptrdiff_t difference;
 
-    printf("\n>> ");
+    printf("\n\n>> ");
     fgets(command, COMMAND_SIZE, stdin);
     if (command[0] == '\n') // 直接Enter时
         return END;
@@ -76,7 +90,7 @@ enum CommandType formatInputCommand(char command[]) {
     difference = endPtr - command; // length of the string
     if (difference >= COMMAND_SIZE - 1) {
         bufferClear(NULL); // 只有此时才需要 bufferClear()，否则字符串没超过最大限定长度，缓冲区没东西，bufferClear() 导致程序暂停
-        printf("\nThe string length has reached the maxium allowable length(%d)", COMMAND_SIZE - 1);
+        printf("\n<<\n-=-= The string length has reached the maxium allowable length(%d) =-=-", COMMAND_SIZE - 1);
         wrongPrint(command, endPtr, NULL);
         return FALSE_INPUT;
     }
@@ -89,7 +103,7 @@ enum CommandType formatInputCommand(char command[]) {
     strcpy(commandCpy, command); // 为不改变原参数，因而需要复制，前面已经保证了此处字符串 commandCpy 可以装的下所有字符
     tempPtr = strchr(commandCpy, '('); // find command string
     if (tempPtr == NULL) {
-        wrongPrint(commandCpy, commandCpy, "-=-= Command format error =-=-");
+        wrongPrint(commandCpy, commandCpy, "\n<<\n-=-= Command format error(formatInputCommand()) =-=-");
         return FALSE_INPUT;
     }
     else
@@ -102,7 +116,7 @@ enum CommandType formatInputCommand(char command[]) {
     else if (strcmp(COMP_STR, commandCpy) == 0)
         type = 3;
     else {
-        wrongPrint(commandCpy, commandCpy, "-=-= Command error =-=-");
+        wrongPrint(commandCpy, commandCpy, "\n<<\n-=-= Command error(formatInputCommand()) =-=-");
         return FALSE_INPUT;
     }
     *tempPtr = '('; // 恢复先
@@ -129,7 +143,7 @@ enum CommandType formatInputCommand(char command[]) {
         if (argMode == 0)
             return FALSE_INPUT;
         else if (argMode == 1) {
-            wrongPrint(command, tempPtr + 1, "This string have some error:");
+            wrongPrint(command, tempPtr + 1, "\n<<\n-=-= This string have some error(formatInputCommand()) =-=-");
             return FALSE_INPUT;
         }
         else if (argMode == 2)
@@ -137,7 +151,7 @@ enum CommandType formatInputCommand(char command[]) {
         break;
     }
 
-    wrongPrint(command, command, "There are some wrongs in this string");
+    wrongPrint(command, command, "\n<<\n-=-= This string have some error(formatInputCommand()) =-=-");
     return FALSE_INPUT;
 }
 
@@ -150,18 +164,18 @@ enum CommandType formatInputCommand(char command[]) {
  * 5.postfix -> tree (~a -> (0-a))
  * return root of the expression tree at the end of function 'formatMathArgument()'
  * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
-Tree* formatMathArgument(const char command[], enum CommandType mode) {
+Tree* formatMathArgument(const char command[]) {
     char* expStart;
     char expression[COMMAND_SIZE] = {'\0'};
 
     expStart = strchr(command, '(');
     expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险, expStart is the next pointer of '('
     if (*expStart == ',') { // this situation is like: diff(,)
-        wrongPrint(command, expStart, "-=-= The expression is not exist =-=-");
+        wrongPrint(command, expStart, "\n<<\n-=-= The expression is not exist =-=-");
         return NULL;
     }
     ptrdiff_t diff = strchr(expStart, ',') - expStart; // 找到第一个逗号，diff 一定远小于 COMMAND_SIZE
-    // expression 数组初始化为全 '\0'，因此保证 expression 数组存在 '\0' 来结束字符串(strncpy函数不考虑字符串末尾 '\0')
+    // expression 数组初始化为全 '\0'，因此保证 expression 数组存在 '\0' 来结束字符串(strncpy函数不考虑字符串末尾'\0')
     strncpy(expression, expStart, (int)diff);
 
     /* use lexicon_analysis module to identify the/first(mode5 have 2 expresion) expression
@@ -190,22 +204,18 @@ Tree* formatMathArgument(const char command[], enum CommandType mode) {
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
     printf("Postfix:\n\t");
     tokenPrint(postfix);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 5.postfix -> tree(~a -> (0-a)) */
-    
-
-    /* select mode */
-    switch (mode) {
-    case DIFF_CHAR:
-    case DIFF_NUM:
-    case INTE_CHAR:
-    case INTE_NUM:
-    case COMP:
-    }
-
+    Tree* expRoot = postfixToTree(postfix);
+    if (expRoot == NULL)
+        return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    Tree* retTest;
-    return retTest;
+    printf("Expression tree:\n");
+    treePrint(expRoot, 1);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
+
+    return expRoot;
 }

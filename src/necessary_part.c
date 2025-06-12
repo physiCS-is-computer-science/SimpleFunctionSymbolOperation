@@ -15,7 +15,6 @@ void __processQuitGetchar(void) { // 临时中断程序函数
 }
 
 void __printer1(int a) {
-    putchar('\n');
     if (a == 1)
         printf("1.%s(function, order)\n", DIFF_STR);
     if (a == 2)
@@ -33,35 +32,6 @@ void bufferClear(char* screenPrint) {
         printf("%s", screenPrint);
     while (getchar() != '\n')
         continue;
-}
-
-void destroyTree(Tree* root) {
-    if (root == NULL)
-        return;
-    destroyTree(root->left);
-    destroyTree(root->right);
-
-    /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    if (root->isNum)
-        printf("freedom '%d'\n", root->num);
-    if (root->isOp == 't')
-        printf("freedom '%c'\n", root->op);
-    if (root->isVar == 't')
-        printf("freedom '%c'\n", root->var);
-    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
-
-    free(root);
-}
-
-Tree* linkNode(Tree* leftLeaf, Tree* rightLeaf) {
-    Tree* current = (Tree*)malloc(sizeof(Tree));
-    current->left = leftLeaf;
-    current->right = rightLeaf;
-    return current;
-}
-
-/* 创建左右树叶儿子都指向NULL的节点 */
-Tree* aNode(int type) {
 }
 
 /* 四种基本栈操作(char类型栈) */
@@ -118,7 +88,7 @@ char isEmptyToken(Token* tmp) { // 判断单个 token 是否为空
         return FALSE_CH;
 }
 
-/* 四种基本栈操作(存储 op 类型数据的 Token* 类型栈) */
+/* 四种基本栈操作(存储 op 类型数据的 Token 类型栈) */
 Token tokenOpPush(Token stack[], Token aim, int size) { // 返回 被压入栈的 token 或 emptyToken
     int i = -1;
     Token emptyToken = {FALSE_CH};
@@ -207,4 +177,116 @@ int opLevel(char op) {
         return 4;
     else
         return -1;
+}
+
+void clearNode(Tree* node) {
+    node->isDiff = FALSE_CH;
+    node->isInte = FALSE_CH;
+    node->isNum = FALSE_CH;
+    node->isOp = FALSE_CH;
+    node->isVar = FALSE_CH;
+    node->num = 0;
+    node->op = FALSE_CH;
+    node->var = FALSE_CH;
+    node->left = NULL;
+    node->right = NULL;
+}
+
+// char isEmptyTree(Tree* tmp) { // 判断单个 Tree 是否为空
+//     if (!tmp->isNum && !tmp->isOp && !tmp->isVar)
+//         return TRUE_CH;
+//     else
+//         return FALSE_CH;
+// }
+
+/* 四种基本栈操作(Tree 类型栈) */
+Tree* treePush(Tree* stack[], Tree* aim, int size) {
+    int i = -1;
+
+    while (stack[++i] != NULL) {
+        if (i >= size - 1)
+            return NULL;
+    }
+    stack[i] = aim;
+    return stack[i];
+}
+Tree* treePop(Tree* stack[], int size) { // 失败返回NULL，成功弹出并返回栈顶
+    if (stack[0] == NULL) // 空栈
+        return NULL;
+
+    Tree* top;
+    if (stack[size - 1] != NULL) { // 满栈
+        top = stack[size - 1];
+        stack[size - 1] = NULL;
+        return top;
+    }
+
+    int i = -1; // 普通情况
+    while (stack[++i] != NULL)
+        continue;
+    top = stack[--i];
+    stack[i] = NULL;
+    return top;
+}
+Tree* treeTop(Tree* stack[], int size) { // 空栈返回NULL
+    if (stack[size - 1] != NULL) // 满栈
+        return stack[size - 1];
+    if (stack[0] == NULL) // 空栈
+        return stack[0];
+
+    int i = -1; // 普通情况
+    while (stack[++i] != NULL)
+        continue;
+    return stack[--i];
+}
+char isTreeStackEmpty(Tree* stack[]) {
+    if (stack[0] == NULL)
+        return TRUE_CH;
+    else
+        return FALSE_CH;
+}
+
+void destroyTree(Tree* root) {
+    if (root == NULL)
+        return;
+    destroyTree(root->left);
+    destroyTree(root->right);
+
+    /* -=-=-=-=-= StartTest =-=-=-=-=- */
+    if (root->isNum)
+        printf("[%d]: ", root->num);
+    if (root->isVar)
+        printf("[%c]: ", root->var);
+    if (root->isOp)
+        printf("[%c]: ", root->op);
+    printf("%p will be freedom\n", root);
+    /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
+
+    free(root);
+}
+
+void freeStack(Tree* stack[]) {
+    int i = -1;
+    while (stack[++i] != NULL) {
+        printf("stack[%d]-root: %p will be freedom\n", i, stack[i]); // test
+        destroyTree(stack[i]);
+    }
+}
+
+Tree* aNode(Token token) { // 转化 Token 为 Tree 并初始化
+    Tree* current = (Tree*)malloc(sizeof(Tree));
+    clearNode(current);
+    if (token.isNum) {
+        current->isNum = TRUE_CH;
+        current->num = token.num;
+    }
+    if (token.isOp) {
+        current->isOp = TRUE_CH;
+        current->op = token.op;
+    }
+    if (token.isVar) {
+        current->isVar = TRUE_CH;
+        current->var = token.var;
+    }
+    return current;
 }

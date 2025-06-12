@@ -34,19 +34,19 @@
 #include <stdlib.h>
 
 void mainMenu(void);
-Tree* formatMathArgument(const char command[], enum CommandType mode); // check the argument of command, return 1/0
+void __printer1(int a);
+Tree* formatMathArgument(const char command[]); // check the argument of command, return 1/0
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
 void destroyTree(Tree* root);
-void __printer1(int a);
 
 int main(void) {
-    char inputCommand[COMMAND_SIZE];
-    Tree* isFormat = NULL;
+    Tree* isFormat = NULL; // 本身就是树根
     enum CommandType commandType;
 
     mainMenu();
 
     while (1) { // 多个测试用例需要循环，不然重复运行好麻烦，待删除
+        char inputCommand[COMMAND_SIZE] = {'\0'};
         /* string and lexical processing */
         while (1) {
             commandType = formatInputCommand(inputCommand);
@@ -56,24 +56,34 @@ int main(void) {
             else if (commandType == END) // enter to quit
                 return 0;
             else if (commandType >= DIFF_CHAR && commandType <= COMP) // identify the command mode
-                isFormat = formatMathArgument(inputCommand, commandType);
+                isFormat = formatMathArgument(inputCommand);
 
             if (isFormat)
                 break;
         }
         /* -=-=-=-=-= StartTest =-=-=-=-=- */
         __printer1(commandType);
-        // destroyTree(isFormat);
-        bufferClear("-=-= testest =-=-");
+        destroyTree(isFormat);
         /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
         /* Compute module */
+        char temp;
         switch (commandType) {
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-        case 5:
+        case DIFF_CHAR:
+            // if (simplification(isFormat) == FALSE_CH) // check the function for the last time
+            //     break;
+            // differentiate(isFormat);
+            break;
+        case DIFF_NUM:
+            break;
+        case INTE_CHAR:
+            break;
+        case INTE_NUM:
+            printf("---\nThis module is'n supported yet.\n");
+            break;
+        case COMP:
+            printf("---\nThis module is'n supported yet.\n");
+            break;
         }
     }
 

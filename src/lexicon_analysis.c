@@ -33,11 +33,18 @@ char isEmptyToken(Token* tmp); // 判断单个 token 是否为空
 char chPush(char stack[], char aim, int size);
 char chPop(char stack[], int size);
 char isChEmpty(char stack[]);
+int opLevel(char op);
 Token tokenOpPush(Token stack[], Token aim, int size); // 返回 被压入栈的 token 地址或 NULL
 Token tokenOpPop(Token stack[], int size); // 失败返回空栈，成功弹出并返回栈顶
 Token tokenOpTop(Token stack[], int size); // 栈顶
 char isTokenOpStackEmpty(Token stack[]); // 判断 token 类型栈是否为空
-int opLevel(char op);
+Tree* treePush(Tree* stack[], Tree* aim, int size);
+Tree* treePop(Tree* stack[], int size);
+Tree* treeTop(Tree* stack[], int size);
+char isTreeStackEmpty(Tree* stack[]);
+Tree* aNode(Token token);
+void destroyTree(Tree* root);
+void freeStack(Tree* stack[]);
 
 /* return NULL or pointer start */
 char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
@@ -117,19 +124,19 @@ char expCorrect(char exp[]) {
     for (int i = 0; *bracketPtr != '\0'; i++, bracketPtr++) {
         if (*bracketPtr == '(') {
             if (chPush(bracketStack, '(', sizeof(bracketStack)) == FALSE_CH) {
-                wrongPrint(exp, bracketPtr, "-=-= Error(chPush()) =-=-");
+                wrongPrint(exp, bracketPtr, "\n<<\n-=-= Error(chPush()) =-=-");
                 return FALSE_CH;
             }
         }
         else if (*bracketPtr == ')') {
             if (chPop(bracketStack, sizeof(bracketStack)) == FALSE_CH) {
-                wrongPrint(exp, bracketPtr, "-=-= Error(chPop()) =-=-");
+                wrongPrint(exp, bracketPtr, "\n<<\n-=-= Error(chPop()) =-=-");
                 return FALSE_CH;
             }
         }
     }
     if (!isChEmpty(bracketStack)) {
-        wrongPrint(exp, exp, "-=-= The bracket stack should be empty(isChEmpty()) =-=-");
+        wrongPrint(exp, exp, "\n<<\n-=-= The bracket stack should be empty(isChEmpty()) =-=-");
         return FALSE_CH;
     }
 
@@ -167,7 +174,7 @@ char expCorrect(char exp[]) {
         }
     }
     if (isThat) { // the situation such as "x----"
-        wrongPrint(exp, opStart, "-=-= Illegal end(expCorrect()) =-=-");
+        wrongPrint(exp, opStart, "\n<<\n-=-= Illegal end(expCorrect()) =-=-");
         return FALSE_CH;
     }
 
@@ -195,13 +202,13 @@ char expCorrect(char exp[]) {
     chFind(exp, allTimes, '*');
     for (int i = 0; allDivision[i] != NULL; i++) {
         if (!hasLeft(exp, allDivision[i], "1234567890x)")) {
-            wrongPrint(exp, allDivision[i], "-=-= Divisiion error(hasLeft()) =-=-");
+            wrongPrint(exp, allDivision[i], "\n<<\n-=-= Divisiion error(hasLeft()) =-=-");
             return FALSE_CH;
         }
     }
     for (int i = 0; allTimes[i] != NULL; i++) {
         if (!hasLeft(exp, allTimes[i], "1234567890x)")) {
-            wrongPrint(exp, allTimes[i], "-=-= Times error(hasLeft()) =-=-");
+            wrongPrint(exp, allTimes[i], "\n<<\n-=-= Times error(hasLeft()) =-=-");
             return FALSE_CH;
         }
     }
@@ -209,7 +216,7 @@ char expCorrect(char exp[]) {
     /* 4.查非法字符(非"1234567890 x()+-/^*~"), 空格为合法字符 */
     for (char* currPtr = exp; *currPtr != '\0'; currPtr++) {
         if (strchr("1234567890 x()+-/^*~", *currPtr) == NULL) {
-            wrongPrint(exp, currPtr, " -=-= Illegal characters =-=-");
+            wrongPrint(exp, currPtr, "\n<<\n-=-= Illegal characters =-=-");
             return FALSE_CH;
         }
     }
@@ -220,7 +227,7 @@ char expCorrect(char exp[]) {
         continue;
     currPtr--;
     if (strchr("+-*/^(", *currPtr) != NULL) {
-        wrongPrint(exp, currPtr, "-=-= Should not be an operator(expCorrect()) =-=-");
+        wrongPrint(exp, currPtr, "\n<<\n-=-= Should not be an operator(expCorrect()) =-=-");
         return FALSE_CH;
     }
 
@@ -264,7 +271,7 @@ char tokenCorrect(Token tokens[]) { // max size is COMMAND_SIZE，专门检查 ^
         if (current != NULL) {
             current++;
             if (current->isOp && current->op == '~') {
-                wrongPrintT(tokens, current, "-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
+                wrongPrintT(tokens, current, "\n<<\n-=-= '-' is'n allowed directly after the '^, the correct format is: ^(-) (tokenCrrect()) =-=-");
                 return FALSE_CH;
             }
         }
@@ -292,7 +299,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
         if (tokens[i].op == '(') { // 左括号直接入栈
             tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
             if (isEmptyToken(&tmpToken)) {
-                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                wrongPrintT(tokens, &tokens[i], "\n<<\n-=-= Full stack(tokenToPostfix()) =-=-");
                 return FALSE_CH;
             }
             continue;
@@ -327,7 +334,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
             }
             tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
             if (isEmptyToken(&tmpToken)) {
-                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                wrongPrintT(tokens, &tokens[i], "\n<<\n-=-= Full stack(tokenToPostfix()) =-=-");
                 return FALSE_CH;
             }
             continue;
@@ -341,7 +348,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
             }
             tmpToken = tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
             if (isEmptyToken(&tmpToken)) {
-                wrongPrintT(tokens, &tokens[i], "-=-= Full stack(tokenToPostfix()) =-=-");
+                wrongPrintT(tokens, &tokens[i], "\n<<\n-=-= Full stack(tokenToPostfix()) =-=-");
                 return FALSE_CH;
             }
             continue;
@@ -359,6 +366,95 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
         }
     }
 
-    wrongPrintT(tokens, tokens, "-=-= Unknown error(tokenToPostfix()) =-=-");
+    wrongPrintT(tokens, tokens, "\n<<\n-=-= Expression is too long(tokenToPostfix()) =-=-");
     return FALSE_CH;
+}
+
+Tree* postfixToTree(Token postfix[]) {
+    if (postfix[0].isOp) {
+        wrongPrintT(postfix, &postfix[0], "\n<<\n-=-= The first character should not be an operator(postfixToTree()) =-=-");
+        return NULL;
+    }
+
+    Tree *current = NULL, *tmp = NULL;
+    Tree* nodeStack[COMMAND_SIZE] = {NULL}; // 存储申请过内存的节点的指针
+    Token zero = {.isNum = TRUE_CH, .num = 0}; // 供 ~ 转化
+    for (int i = 0; !isEmptyToken(&postfix[i]); i++) {
+        current = aNode(postfix[i]); // aNode()接受一个 Token 并申请内存转换为 Tree，随后返回该内存指针
+
+        if (current->isNum || current->isVar) { // 数字 或 x 直接入栈
+            if (treePush(nodeStack, current, COMMAND_SIZE) == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack full(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+            continue;
+        }
+
+        if (current->isOp && current->op == '~') { // 一元负号时
+            tmp = treePop(nodeStack, COMMAND_SIZE);
+            if (tmp == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack empty(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+
+            current->op = '-';
+            current->left = aNode(zero);
+            current->right = tmp;
+
+            tmp = treePush(nodeStack, current, COMMAND_SIZE); //
+            if (tmp == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack full(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+            continue;
+        }
+
+        if (current->isOp && current->op != '~') { // 非一元运算符 '-' 时
+            tmp = treePop(nodeStack, COMMAND_SIZE);
+            if (tmp == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack empty(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+            current->right = tmp;
+
+            tmp = treePop(nodeStack, COMMAND_SIZE);
+            if (tmp == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack empty(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+            current->left = tmp;
+
+            tmp = treePush(nodeStack, current, COMMAND_SIZE);
+            if (tmp == NULL) {
+                wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack full(postfixToTree()) =-=-");
+                destroyTree(current);
+                freeStack(nodeStack);
+                return NULL;
+            }
+            continue;
+        }
+    }
+
+    if (nodeStack[1] != NULL) {
+        wrongPrintT(postfix, postfix, "\n<<\n-=-= The nodeStack has more than one element(postfixToTree()) =-=-");
+        freeStack(nodeStack);
+        return NULL;
+    }
+    if (nodeStack[0] == NULL) {
+        wrongPrintT(postfix, postfix, "\n<<\n-=-= The nodeStack[0] is not exit(postfixToTRee()) =-=-");
+        freeStack(nodeStack);
+        return NULL;
+    }
+
+    return nodeStack[0];
 }
