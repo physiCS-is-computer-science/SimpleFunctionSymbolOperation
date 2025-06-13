@@ -30,7 +30,6 @@ enum CommandType {
     DIFF_NUM,
     INTE_CHAR,
     INTE_NUM,
-    COMP,
     END
 };
 

@@ -9,22 +9,20 @@
 #include <string.h>
 
 void __processQuitGetchar(void) { // 临时中断程序函数
-    printf("-=-= Enter to end the process(from function __processQuitGetchar()) =-=-");
+    printf("-=-= Enter to end the process(__processQuitGetchar()) =-=-");
     getchar();
     exit(0);
 }
 
 void __printer1(int a) {
-    if (a == 1)
-        printf("1.%s(function, order)\n", DIFF_STR);
-    if (a == 2)
-        printf("2.%s(function, order, num)\n", DIFF_STR);
-    if (a == 3)
-        printf("3.%s(funcion, order)\n", INTE_STR);
-    if (a == 4)
-        printf("4.%s(function, order, [left, right])\n", INTE_STR);
-    if (a == 5)
-        printf("5.%s(function1, function2, operator)\n", COMP_STR);
+    if (a == DIFF_CHAR)
+        printf("1.%s(function)\n", DIFF_STR);
+    if (a == DIFF_NUM)
+        printf("2.%s(function, x-num)\n", DIFF_STR);
+    if (a == INTE_CHAR)
+        printf("3.%s(funcion)\n", INTE_STR);
+    if (a == INTE_NUM)
+        printf("4.%s(function, [left, right])\n", INTE_STR);
 }
 
 void bufferClear(char* screenPrint) {
@@ -191,13 +189,6 @@ void clearNode(Tree* node) {
     node->left = NULL;
     node->right = NULL;
 }
-
-// char isEmptyTree(Tree* tmp) { // 判断单个 Tree 是否为空
-//     if (!tmp->isNum && !tmp->isOp && !tmp->isVar)
-//         return TRUE_CH;
-//     else
-//         return FALSE_CH;
-// }
 
 /* 四种基本栈操作(Tree 类型栈) */
 Tree* treePush(Tree* stack[], Tree* aim, int size) {

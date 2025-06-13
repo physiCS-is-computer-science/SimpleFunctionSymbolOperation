@@ -17,12 +17,11 @@ static void table(int length, char left, char middle, char right) {
 void mainMenu(void) {
     system("cls"); // depends on windows.h
     table(64, '+', '-', '+');
-    printf("  1.diff(function, order)\n");
-    printf("  2.diff(function, order, num)\n");
-    printf("  3.inte(funcion, order)\n");
-    printf(" *4.inte(function, order, [left, right])\n");
-    printf(" *5.comp(function1, function2, operator)\n");
-    printf("  6.Enter to quit\n");
+    printf("  1.diff(function)\n");
+    printf("  2.diff(function, num)\n");
+    printf("  3.inte(funcion)\n");
+    printf(" *4.inte(function, left, right)\n");
+    printf("  5.Enter to quit\n");
     printf("  ---\n  Those options that with '*' sign were not supported yet! T~T\n");
     table(64, '+', '-', '+');
 }

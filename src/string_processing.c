@@ -14,6 +14,7 @@
 
 #include "temp.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
@@ -24,55 +25,32 @@ char tokenToPostfix(Token tokens[], Token postfix[]); // max: COMMAND_SIZE
 Tree* postfixToTree(Token postfix[]);
 void treePrint(Tree* root, int frameDepth);
 
-/* return mode: 0-wrong 1-non-number-mode 2-number-mode
- * 仅仅检查：命令正确、拥有左括号 的字符串。
- * 并额外检查其括号是否闭合，如果闭合，则保证括号内有 1~2 个及以上个数逗号
- * 可能要重写 */
+/* return mode: 0-wrong 1-non-number-mode 2-number-mode*/
 int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
-    char *firstComma, *secondComma, *endBracket;
+    char *firstComma = NULL, *endBracket = NULL;
 
-    firstComma = strchr(leftBracket, ',');
-    if (firstComma == NULL) {
-        wrongPrint(commandOutput, leftBracket + 1, "\n<<\n-=-= Parameter format error(formatArgumentChar()) =-=-");
+    endBracket = strchr(leftBracket, ')'); // 先看闭合情况
+    if ((endBracket == NULL) || (*(endBracket + 1) != '\0')) { // 有括号并且是最后一个才通过
+        wrongPrint(commandOutput, commandOutput, "\n<<\n-=-= Command argument error(firmatArgumentChar()) =-=-");
         return 0;
     }
 
-    secondComma = strchr(firstComma + 1, ',');
-    if (secondComma == NULL) { // 此时可能是两个参数(一个逗号)
-        endBracket = strchr(firstComma, ')');
-        if (endBracket == NULL) {
-            wrongPrint(commandOutput, firstComma + 1, "\n<<\n-=-= End bracket error(formatArgumentChar()) =-=-");
-            return 0;
-        }
-        else {
-            if (*(endBracket + 1) == '\0')
-                return 1;
-            else {
-                wrongPrint(commandOutput, endBracket + 1, "\n<<\n-=-= String ending error(formatArgumentChar()) =-=-");
-                return 0;
-            }
-        }
+    firstComma = strchr(leftBracket, ','); // 如果到这一步，','一定在')'左边
+    if (firstComma == NULL)
+        return 1;
+    if (strchr(firstComma + 1, ',') != NULL) { // 逗号多
+        wrongPrint(commandOutput, firstComma + 1, "\n<<\n-=-= Too many commas(formatArgumentChar()) =-=-");
+        return 0;
     }
-    else { // 可能是三个参数(两个逗号)
-        endBracket = strchr(secondComma, ')');
-        if (endBracket == NULL) {
-            wrongPrint(commandOutput, secondComma + 1, "\n<<\n-=-= End bracket error(formatArgumentChar()) =-=-");
-            return 0;
-        }
-        else {
-            if (*(endBracket + 1) == '\0')
-                return 2;
-            else {
-                wrongPrint(commandOutput, endBracket + 1, "\n<<\n-=-= String ending error(formatArgumentChar()) =-=-");
-                return 0;
-            }
-        }
+    if (*(firstComma + 1) == ')') { // 无第二参数
+        wrongPrint(commandOutput, firstComma, "\n<<\n-=-= The second argument error(formatArgumentChar()) =-=-");
+        return 0;
     }
+
+    return 2; // 此时：1.字符串最右端为')' 2.只有一个逗号 3.该逗号下一个字符不是')'
 }
 
-/* 分析输入命令是哪个，返回 0 ~ 7 八种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析
- * function formatInputCommand() ensure the string of inputCommand[] must be like : correctCommand(,,)
- * 然而只保证括号闭合时至少 1~2 个逗号，大于2个逗号时，如果括号闭合，检测不出问题 */
+/* 分析输入命令是哪个，返回 6 种值。主函数将返回值赋给词法分析模块函数，该模块对应返回值分析 */
 enum CommandType formatInputCommand(char command[]) {
     char *endPtr, *enterPtr; // enterPtr point to '\n' at the end of the command string
     ptrdiff_t difference;
@@ -98,7 +76,7 @@ enum CommandType formatInputCommand(char command[]) {
     /* scan the string of command */
     char commandCpy[COMMAND_SIZE];
     char* tempPtr;
-    int type, argMode;
+    int type;
 
     strcpy(commandCpy, command); // 为不改变原参数，因而需要复制，前面已经保证了此处字符串 commandCpy 可以装的下所有字符
     tempPtr = strchr(commandCpy, '('); // find command string
@@ -113,15 +91,13 @@ enum CommandType formatInputCommand(char command[]) {
         type = 1;
     else if (strcmp(INTE_STR, commandCpy) == 0)
         type = 2;
-    else if (strcmp(COMP_STR, commandCpy) == 0)
-        type = 3;
     else {
         wrongPrint(commandCpy, commandCpy, "\n<<\n-=-= Command error(formatInputCommand()) =-=-");
         return FALSE_INPUT;
     }
     *tempPtr = '('; // 恢复先
 
-    argMode = formatArgumentChar(commandCpy, tempPtr);
+    char argMode = formatArgumentChar(commandCpy, tempPtr);
     switch (type) {
     case 1: // diff
         if (argMode == 0)
@@ -139,16 +115,6 @@ enum CommandType formatInputCommand(char command[]) {
         else if (argMode == 2)
             return INTE_NUM;
         break;
-    case 3: // comp
-        if (argMode == 0)
-            return FALSE_INPUT;
-        else if (argMode == 1) {
-            wrongPrint(command, tempPtr + 1, "\n<<\n-=-= This string have some error(formatInputCommand()) =-=-");
-            return FALSE_INPUT;
-        }
-        else if (argMode == 2)
-            return COMP;
-        break;
     }
 
     wrongPrint(command, command, "\n<<\n-=-= This string have some error(formatInputCommand()) =-=-");
@@ -164,19 +130,53 @@ enum CommandType formatInputCommand(char command[]) {
  * 5.postfix -> tree (~a -> (0-a))
  * return root of the expression tree at the end of function 'formatMathArgument()'
  * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
-Tree* formatMathArgument(const char command[]) {
-    char* expStart;
-    char expression[COMMAND_SIZE] = {'\0'};
+Tree* formatMathArgument(const char command[], enum CommandType type, int* x) {
+    char* expStart = NULL;
 
     expStart = strchr(command, '(');
     expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险, expStart is the next pointer of '('
-    if (*expStart == ',') { // this situation is like: diff(,)
-        wrongPrint(command, expStart, "\n<<\n-=-= The expression is not exist =-=-");
+    if (*expStart == ',' || *expStart == ')') { // this situation be like: diff(,) or diff()
+        wrongPrint(command, expStart, "\n<<\n-=-= The expression is not exist(formatMathArgument()) =-=-");
         return NULL;
     }
-    ptrdiff_t diff = strchr(expStart, ',') - expStart; // 找到第一个逗号，diff 一定远小于 COMMAND_SIZE
+
+    /* findout the expression */
+    char expression[COMMAND_SIZE] = {'\0'};
+    char* secondArg = NULL;
+    ptrdiff_t diff;
+    if (type == DIFF_CHAR || type == INTE_CHAR) {
+        secondArg = strchr(expStart, ')');
+        diff = secondArg - expStart; // 找到第一个')'，diff 一定远小于 COMMAND_SIZE
+    }
+    else if (type == DIFF_NUM || type == INTE_NUM) { // 第一个','
+        secondArg = strchr(expStart, ',');
+        diff = secondArg - expStart;
+    }
     // expression 数组初始化为全 '\0'，因此保证 expression 数组存在 '\0' 来结束字符串(strncpy函数不考虑字符串末尾'\0')
     strncpy(expression, expStart, (int)diff);
+
+    /* other paremeters proccess */
+    char* secondEnd = NULL;
+    int tmpX = -1;
+    while (*(++secondArg) == ' ') // 此时解引用应得到 '\0' 或者 ',的下一个字符'
+        continue;
+    switch (type) {
+    case DIFF_NUM:
+        tmpX = (int)strtol(secondArg, &secondEnd, 10);
+        if (secondEnd == secondArg) { //
+            wrongPrint(command, secondEnd, "\n<<\n-=-= Second argument error(formatMathArgument()) =-=-");
+            return FALSE_INPUT;
+        }
+        if (*secondEnd != ')') { // 数字之后必为 ')'
+            wrongPrint(command, secondEnd, "\n<<\n-=-= Second argument error(formatMathArgument()) =-=-");
+            return FALSE_INPUT;
+        }
+        *x = tmpX;
+        break;
+    case INTE_NUM:
+        printf("---\n=#=# Those module were not supported yet #=#=\n");
+        return NULL;
+    }
 
     /* use lexicon_analysis module to identify the/first(mode5 have 2 expresion) expression
      * input and convert infix expression to token, and check the expression tree times */

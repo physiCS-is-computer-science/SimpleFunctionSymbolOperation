@@ -35,44 +35,42 @@
 
 void mainMenu(void);
 void __printer1(int a);
-Tree* formatMathArgument(const char command[]); // check the argument of command, return 1/0
+Tree* formatMathArgument(const char command[], enum CommandType type, int* x); // check the argument of command, return 1/0
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
 void destroyTree(Tree* root);
+void treePrint(Tree* root, int frameDepth);
+char simplification(Tree* root);
+void differentiate(Tree* root);
 
 int main(void) {
-    Tree* isFormat = NULL; // 本身就是树根
     enum CommandType commandType;
+    while (1) {
+        Tree* root = NULL; // 本身就是树根
+        int x = -1;
 
-    mainMenu();
+        mainMenu();
 
-    while (1) { // 多个测试用例需要循环，不然重复运行好麻烦，待删除
-        char inputCommand[COMMAND_SIZE] = {'\0'};
         /* string and lexical processing */
-        while (1) {
+        while (root == NULL) {
+            char inputCommand[COMMAND_SIZE] = {'\0'};
             commandType = formatInputCommand(inputCommand);
 
             if (commandType == FALSE_INPUT)
                 continue;
             else if (commandType == END) // enter to quit
                 return 0;
-            else if (commandType >= DIFF_CHAR && commandType <= COMP) // identify the command mode
-                isFormat = formatMathArgument(inputCommand);
-
-            if (isFormat)
-                break;
+            else if (commandType >= DIFF_CHAR && commandType <= INTE_NUM) // identify the command mode
+                root = formatMathArgument(inputCommand, commandType, &x); // 只支持1、2、3，其他情况该函数返回 NULL 以终止
         }
-        /* -=-=-=-=-= StartTest =-=-=-=-=- */
-        __printer1(commandType);
-        destroyTree(isFormat);
-        /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
+        __printer1(commandType); // test
 
         /* Compute module */
-        char temp;
         switch (commandType) {
         case DIFF_CHAR:
-            // if (simplification(isFormat) == FALSE_CH) // check the function for the last time
+            // if (simplification(root) == FALSE_CH) // check the function for the last time
             //     break;
-            // differentiate(isFormat);
+            // differentiate(root);
+            // treePrint(root, 1);
             break;
         case DIFF_NUM:
             break;
@@ -81,13 +79,11 @@ int main(void) {
         case INTE_NUM:
             printf("---\nThis module is'n supported yet.\n");
             break;
-        case COMP:
-            printf("---\nThis module is'n supported yet.\n");
-            break;
         }
-    }
 
-    return 0;
+        destroyTree(root);
+        bufferClear("\n-=-= Press key Enter to compute new function(bufferClear()) =-=-");
+    }
 }
 
 /* ⣀⣆⣰⣒⣒⡀⢀⠔⠠⠤⡦⠤⠄⢴⠤⠤⠤⢴⠄
