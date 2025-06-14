@@ -23,7 +23,6 @@
 
 #include "temp.h"
 #include <ctype.h>
-#include <stdlib.h>
 #include <string.h>
 
 void fillChToken(Token* aim, char ch);

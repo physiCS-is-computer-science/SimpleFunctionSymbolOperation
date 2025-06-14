@@ -13,8 +13,6 @@
  */
 
 #include "temp.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void tokenPrint(Token tokens[]); // the max size of tokens is COMMAND_SIZE
@@ -29,9 +27,9 @@ void treePrint(Tree* root, int frameDepth);
 int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     char *firstComma = NULL, *endBracket = NULL;
 
-    endBracket = strchr(leftBracket, ')'); // 先看闭合情况
-    if ((endBracket == NULL) || (*(endBracket + 1) != '\0')) { // 有括号并且是最后一个才通过
-        wrongPrint(commandOutput, commandOutput, "\n<<\n-=-= Command argument error(firmatArgumentChar()) =-=-");
+    endBracket = strchr(leftBracket, '\0'); // 先看闭合情况
+    if (*(endBracket - 1) != ')') { // 有括号并且是最后一个才通过
+        wrongPrint(commandOutput, commandOutput, "\n<<\n-=-= The string final character is not ')'(firmatArgumentChar()) =-=-");
         return 0;
     }
 
@@ -145,7 +143,8 @@ Tree* formatMathArgument(const char command[], enum CommandType type, int* x) {
     char* secondArg = NULL;
     ptrdiff_t diff;
     if (type == DIFF_CHAR || type == INTE_CHAR) {
-        secondArg = strchr(expStart, ')');
+        secondArg = strchr(expStart, '\0');
+        secondArg--;
         diff = secondArg - expStart; // 找到第一个')'，diff 一定远小于 COMMAND_SIZE
     }
     else if (type == DIFF_NUM || type == INTE_NUM) { // 第一个','

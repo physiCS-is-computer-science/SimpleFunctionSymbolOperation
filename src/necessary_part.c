@@ -4,8 +4,6 @@
  */
 
 #include "temp.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void __processQuitGetchar(void) { // 临时中断程序函数
@@ -279,5 +277,46 @@ Tree* aNode(Token token) { // 转化 Token 为 Tree 并初始化
         current->isVar = TRUE_CH;
         current->var = token.var;
     }
+    return current;
+}
+
+void initNode(Tree* node) {
+    node->isDiff = FALSE_CH;
+    node->isInte = FALSE_CH;
+    node->isNum = FALSE_CH;
+    node->isOp = FALSE_CH;
+    node->isVar = FALSE_CH;
+    node->num = 0;
+    node->op = FALSE_CH;
+    node->var = FALSE_CH;
+    node->left = NULL;
+    node->right = NULL;
+}
+
+Tree* copyNode(const Tree* node) { // 副本节点仅仅复制"op""num""var"，其他的都初始化为FALSE_CH（左右子指针也不复制）
+    Tree* new = (Tree*)malloc(sizeof(Tree));
+    initNode(new);
+
+    if (node->isNum) {
+        new->isNum = node->isNum;
+        new->num = node->num;
+    }
+    else if (node->isOp) {
+        new->isOp = node->isOp;
+        new->op = node->op;
+    }
+    else if (node->isVar) {
+        new->isVar = node->isVar;
+        new->var = node->var;
+    }
+    return new;
+}
+
+Tree* copyTree(const Tree* node) { // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH
+    if (node == NULL)
+        return NULL;
+    Tree* current = copyNode(node); // 返回副本指针
+    current->left = copyTree(node->left);
+    current->right = copyTree(node->right);
     return current;
 }

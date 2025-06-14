@@ -5,12 +5,14 @@
 /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 #pragma once
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #define COMMAND_SIZE 100
 #define TRUE_CH 't'
 #define FALSE_CH '\0'
 #define DIFF_STR "diff"
 #define INTE_STR "inte"
-#define COMP_STR "comp"
 
 typedef struct BinaryTreeCell {
     char isVar, isOp, isNum, isDiff, isInte, var, op;
