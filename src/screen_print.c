@@ -3,6 +3,7 @@
 #include <windows.h>
 
 char isEmptyToken(Token* tmp); // 判断单个 token 是否为空
+int opLevel(char op);
 
 void table(int length, char left, char middle, char right) {
     putchar(left);
@@ -104,4 +105,37 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
         putchar('~');
     putchar('\n');
     table((int)length + 2, '=', '=', '=');
+}
+
+/* strcat() 函数每次都在字符串末尾（即'\0'处）追加新字符串，并且 infix 已经初始化为'\0' */
+void treeToInfix(Tree* root, char* infix, int parentLevel) {
+    if (root == NULL)
+        return;
+
+    char tmp[COMMAND_SIZE / 10] = {'\0'};
+    int level = root->isOp ? opLevel(root->op) : -1;
+    char needBracket = ((level != -1) && (level <= parentLevel)); // compare with parent
+
+    if (needBracket)
+        strcat(infix, "(");
+
+    /* infix */
+    treeToInfix(root->left, infix, level);
+    if (root->isOp) {
+        sprintf(tmp, "%c", root->op);
+        strcat(infix, tmp);
+    }
+    else if (root->isNum) {
+        if (root->num == (int)(root->num)) // 如果是整数的话
+            sprintf(tmp, "%d", (int)(root->num));
+        else
+            sprintf(tmp, "%.5lf", root->num);
+        strcat(infix, tmp);
+    }
+    else if (root->isVar)
+        strcat(infix, "x");
+    treeToInfix(root->right, infix, level);
+
+    if (needBracket)
+        strcat(infix, ")");
 }

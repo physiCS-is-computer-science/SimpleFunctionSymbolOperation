@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define COMMAND_SIZE 100
+#define COMMAND_SIZE 200
 #define TRUE_CH 't'
 #define FALSE_CH '\0'
 #define DIFF_STR "diff"

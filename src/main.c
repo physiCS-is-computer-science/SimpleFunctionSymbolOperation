@@ -42,17 +42,22 @@ void treePrint(Tree* root, int frameDepth);
 void simp(Tree* root);
 void diff(Tree* root);
 void substitutionX(Tree* root, double x); // 仅仅替换 var 为目标数字
+char treeCorrect(Tree* root);
+void treeToInfix(Tree* root, char* infix, int parentLevel);
 
 int main(void) {
     while (1) {
+        char isRightTree = FALSE_CH;
+        char infix[COMMAND_SIZE] = {'\0'};
         double x = -1;
         Tree* root = NULL;
         enum CommandType commandType;
 
         mainMenu();
 
-        /* string and lexical processing */
-        while (root == NULL) {
+        /* string and lexicon processing, with tree correct */
+        while (root == NULL || !isRightTree) {
+            destroyTree(root);
             char inputCommand[COMMAND_SIZE] = {'\0'};
             commandType = formatInputCommand(inputCommand);
 
@@ -62,6 +67,8 @@ int main(void) {
                 return 0;
             else if (commandType >= DIFF_CHAR && commandType <= INTE_NUM) // identify the command mode
                 root = formatMathArgument(inputCommand, commandType, &x);
+
+            isRightTree = treeCorrect(root);
         }
 
         /* Compute module */
@@ -88,11 +95,10 @@ int main(void) {
         printf("\nSimplified resualt tree:\n");
         treePrint(root, 1);
 
+        treeToInfix(root, infix, -1); //
         putchar('\n');
-        table(45, '#', '#', '#');
-        printf("# Final resualt #\n\t\n");
-        //
-        table(45, '#', '#', '#');
+        printf("# Final resualt #\n\t");
+        printf("%s\n", infix);
 
         printf("\nDestroy tree log:\n");
         destroyTree(root);

@@ -175,7 +175,7 @@ int opLevel(char op) {
         return -1;
 }
 
-void clearNode(Tree* node) {
+void clearNode(Tree* node) { // 下面的 initNode() 和这个一样，没注意到......
     node->isDiff = FALSE_CH;
     node->isInte = FALSE_CH;
     node->isNum = FALSE_CH;

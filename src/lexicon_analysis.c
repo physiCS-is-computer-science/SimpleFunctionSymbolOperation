@@ -23,6 +23,7 @@
 
 #include "linus_unknow_linux.h"
 #include <ctype.h>
+#include <stdbool.h>
 #include <string.h>
 
 void fillChToken(Token* aim, char ch);
@@ -44,6 +45,8 @@ char isTreeStackEmpty(Tree* stack[]);
 Tree* aNode(Token token);
 void destroyTree(Tree* root);
 void freeStack(Tree* stack[]);
+bool isNumNode(Tree* root);
+void simp(Tree* root);
 
 /* return NULL or pointer start */
 char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
@@ -456,4 +459,27 @@ Tree* postfixToTree(Token postfix[]) {
     }
 
     return nodeStack[0];
+}
+
+char treeCorrect(Tree* root) {
+    if (root == NULL)
+        return TRUE_CH;
+    if (treeCorrect(root->left) == FALSE_CH)
+        return FALSE_CH;
+    if (treeCorrect(root->right) == FALSE_CH)
+        return FALSE_CH;
+
+    if (root->op == '/' && isNumNode(root->right)) {
+        simp(root->right);
+        if (root->right->num == 0) {
+            printf("\n<<\n-=-= Cannot 0 after '/'(treeCorrect()) =-=-\n");
+            return FALSE_CH;
+        }
+    }
+    if (root->op == '^' && !isNumNode(root->right)) {
+        printf("\n<<\n-=-= The function is too complex(treeCorrect()) =-=-\n");
+        return FALSE_CH;
+    }
+
+    return TRUE_CH;
 }
