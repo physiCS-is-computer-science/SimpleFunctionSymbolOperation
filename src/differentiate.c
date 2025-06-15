@@ -187,3 +187,16 @@ void diff(Tree* root) {
     diff(root->left);
     diff(root->right);
 }
+
+void substitutionX(Tree* root, double x) {
+    if (root == NULL)
+        return;
+    substitutionX(root->left, x);
+    substitutionX(root->right, x);
+    if (root->isVar) {
+        root->num = x;
+        root->isNum = TRUE_CH;
+        root->isVar = FALSE_CH;
+        root->var = FALSE_CH;
+    }
+}

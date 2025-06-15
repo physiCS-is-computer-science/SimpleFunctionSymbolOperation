@@ -16,7 +16,7 @@
 
 typedef struct BinaryTreeCell {
     char isVar, isOp, isNum, isDiff, isInte, var, op;
-    int num;
+    double num;
     struct BinaryTreeCell* left;
     struct BinaryTreeCell* right;
 } Tree;

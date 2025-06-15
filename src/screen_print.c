@@ -4,7 +4,7 @@
 
 char isEmptyToken(Token* tmp); // 判断单个 token 是否为空
 
-static void table(int length, char left, char middle, char right) {
+void table(int length, char left, char middle, char right) {
     putchar(left);
     for (int i = 1; i <= length - 2; i++)
         putchar(middle);
@@ -15,14 +15,14 @@ static void table(int length, char left, char middle, char right) {
 /* help to choose module */
 void mainMenu(void) {
     system("cls"); // depends on windows.h
-    table(64, '+', '-', '+');
+    table(25, '+', '-', '+');
     printf("  1.diff(function)\n");
     printf("  2.diff(function, num)\n");
-    printf("  3.inte(funcion)\n");
-    printf(" *4.inte(function, left, right)\n");
+    // printf(" *3.inte(funcion)\n");
+    // printf(" *4.inte(function, left, right)\n");
     printf("  5.Enter to quit\n");
-    printf("  ---\n  Those options that with '*' sign were not supported yet! T~T\n");
-    table(64, '+', '-', '+');
+    // printf("  ---\n  Those options that with '*' sign were not supported yet! T~T\n");
+    table(25, '+', '-', '+');
 }
 
 void tokenPrint(Token tokens[]) { // the max size of tokens is COMMAND_SIZE. print the tokens array like a string
@@ -75,7 +75,7 @@ void treePrint(Tree* root, int frameDepth) {
     for (int i = 0; i < frameDepth; i++)
         putchar('\t');
     if (root->isNum)
-        printf("%d|[%d]\n", frameDepth, root->num);
+        printf("%d|[%.2lf]\n", frameDepth, root->num);
     if (root->isVar)
         printf("%d|[%c]\n", frameDepth, root->var);
     if (root->isOp)
@@ -104,4 +104,7 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
         putchar('~');
     putchar('\n');
     table((int)length + 2, '=', '=', '=');
+}
+
+void treeToInorderPrint(Tree* root) {
 }

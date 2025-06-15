@@ -31,18 +31,20 @@
 
 #include "temp.h"
 
+void table(int length, char left, char middle, char right);
 void mainMenu(void);
-void __printer1(int a);
-Tree* formatMathArgument(const char command[], enum CommandType type, int* x); // check the argument of command, return 1/0
+// void __printer1(int a);
+Tree* formatMathArgument(const char command[], enum CommandType type, double* x); // check the argument of command, return 1/0
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
 void destroyTree(Tree* root);
 void treePrint(Tree* root, int frameDepth);
 void simp(Tree* root);
 void diff(Tree* root);
+void substitutionX(Tree* root, double x);
 
 int main(void) {
     while (1) {
-        int x = -1;
+        double x = -1;
         Tree* root = NULL; // 本身就是树根
         enum CommandType commandType;
 
@@ -60,7 +62,6 @@ int main(void) {
             else if (commandType >= DIFF_CHAR && commandType <= INTE_NUM) // identify the command mode
                 root = formatMathArgument(inputCommand, commandType, &x);
         }
-        __printer1(commandType); // test
 
         /* Compute module */
         switch (commandType) {
@@ -71,28 +72,32 @@ int main(void) {
         case DIFF_NUM:
             root->isDiff = TRUE_CH;
             diff(root);
-            //
+            substitutionX(root, x);
             break;
-        case INTE_CHAR:
-            // integration();
-            break;
-        case INTE_NUM:
-            printf("---\nThis module is'n supported yet.\n");
-            break;
+            // case INTE_CHAR:
+            // case INTE_NUM:
+            //     bufferClear("---\nThis module is'n supported yet.\n");
+            //     continue;
         }
         /* -=-=-=-=-= StartTest =-=-=-=-=- */
         printf("Unsimplified resualt tree:\n");
         treePrint(root, 1);
         /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
-        printf("---\n");
+        printf("\nSimplified tree log:\n");
         simp(root);
-        printf("---\nSimplified resualt tree:\n");
+        printf("\nSimplified resualt tree:\n");
         treePrint(root, 1);
 
-        printf("---\n");
+        putchar('\n');
+        table(45, '#', '#', '#');
+        // pirntf("# Final resualt #\n\t");
+        // treeToInorderPrint(root);
+        table(45, '#', '#', '#');
+
+        printf("\nDestroy tree log:\n");
         destroyTree(root);
-        printf("---");
+
         bufferClear("\n-=-= Press key Enter to compute new function(bufferClear()) =-=-");
     }
 }

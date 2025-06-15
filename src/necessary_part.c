@@ -243,7 +243,7 @@ void destroyTree(Tree* root) {
 
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
     if (root->isNum)
-        printf("[%d]: ", root->num);
+        printf("[%.2lf]: ", root->num);
     if (root->isVar)
         printf("[%c]: ", root->var);
     if (root->isOp)

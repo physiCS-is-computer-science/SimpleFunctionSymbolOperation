@@ -128,7 +128,7 @@ enum CommandType formatInputCommand(char command[]) {
  * 5.postfix -> tree (~a -> (0-a))
  * return root of the expression tree at the end of function 'formatMathArgument()'
  * 对命令的参数进一步分析，补全 formatInputCommand() 函数的问题 */
-Tree* formatMathArgument(const char command[], enum CommandType type, int* x) {
+Tree* formatMathArgument(const char command[], enum CommandType type, double* x) {
     char* expStart = NULL;
 
     expStart = strchr(command, '(');
@@ -145,7 +145,7 @@ Tree* formatMathArgument(const char command[], enum CommandType type, int* x) {
     if (type == DIFF_CHAR || type == INTE_CHAR) {
         secondArg = strchr(expStart, '\0');
         secondArg--;
-        diff = secondArg - expStart; // 找到第一个')'，diff 一定远小于 COMMAND_SIZE
+        diff = secondArg - expStart; // 找到第一个')'，diff 一定小于 COMMAND_SIZE
     }
     else if (type == DIFF_NUM || type == INTE_NUM) { // 第一个','
         secondArg = strchr(expStart, ',');
@@ -156,18 +156,18 @@ Tree* formatMathArgument(const char command[], enum CommandType type, int* x) {
 
     /* other paremeters proccess */
     char* secondEnd = NULL;
-    int tmpX = -1;
+    double tmpX = -1;
     while (*(++secondArg) == ' ') // 此时解引用应得到 '\0' 或者 ',的下一个字符'
         continue;
     switch (type) {
     case DIFF_NUM:
-        tmpX = (int)strtol(secondArg, &secondEnd, 10);
+        tmpX = (double)strtod(secondArg, &secondEnd);
         if (secondEnd == secondArg) { //
             wrongPrint(command, secondEnd, "\n<<\n-=-= Second argument error(formatMathArgument()) =-=-");
             return FALSE_INPUT;
         }
         if (*secondEnd != ')') { // 数字之后必为 ')'
-            wrongPrint(command, secondEnd, "\n<<\n-=-= Second argument error(formatMathArgument()) =-=-");
+            wrongPrint(command, secondEnd, "\n<<\n-=-= This character should be ')'(formatMathArgument()) =-=-");
             return FALSE_INPUT;
         }
         *x = tmpX;
