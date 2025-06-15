@@ -22,7 +22,7 @@
  |            |                    |                 [0]  [1]   |                  |
  |------------|--------------------|----------------------------|-----------------*/
 
-#include "temp.h"
+#include "linus_unknow_linux.h"
 #include <stdbool.h>
 
 Tree* copyTree(const Tree* node); // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH

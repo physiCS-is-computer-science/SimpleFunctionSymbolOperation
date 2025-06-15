@@ -29,7 +29,7 @@
  * 于哥尼斯堡内存宫殿
  * C门 */
 
-#include "temp.h"
+#include "linus_unknow_linux.h"
 
 void table(int length, char left, char middle, char right);
 void mainMenu(void);

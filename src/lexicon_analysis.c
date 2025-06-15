@@ -21,7 +21,7 @@
  * 4.遍历一遍找非"+-/^*~() 1234567890"的字符
  */
 
-#include "temp.h"
+#include "linus_unknow_linux.h"
 #include <ctype.h>
 #include <string.h>
 

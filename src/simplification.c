@@ -1,4 +1,4 @@
-#include "temp.h"
+#include "linus_unknow_linux.h"
 #include <math.h>
 
 void simp(Tree* root) {

@@ -3,7 +3,7 @@
  * function __xxx() is temprory test function that will be deleted
  */
 
-#include "temp.h"
+#include "linus_unknow_linux.h"
 #include <string.h>
 
 void __processQuitGetchar(void) { // 临时中断程序函数
