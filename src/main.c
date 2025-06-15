@@ -27,7 +27,8 @@
  * 此致
  * 您最谦卑的时空直观形式
  * 于哥尼斯堡内存宫殿
- * C门 */
+ * C门
+ * */
 
 #include "linus_unknow_linux.h"
 
@@ -40,12 +41,12 @@ void destroyTree(Tree* root);
 void treePrint(Tree* root, int frameDepth);
 void simp(Tree* root);
 void diff(Tree* root);
-void substitutionX(Tree* root, double x);
+void substitutionX(Tree* root, double x); // 仅仅替换 var 为目标数字
 
 int main(void) {
     while (1) {
         double x = -1;
-        Tree* root = NULL; // 本身就是树根
+        Tree* root = NULL;
         enum CommandType commandType;
 
         mainMenu();
@@ -79,10 +80,8 @@ int main(void) {
             //     bufferClear("---\nThis module is'n supported yet.\n");
             //     continue;
         }
-        /* -=-=-=-=-= StartTest =-=-=-=-=- */
         printf("Unsimplified resualt tree:\n");
         treePrint(root, 1);
-        /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
         printf("\nSimplified tree log:\n");
         simp(root);
@@ -91,8 +90,8 @@ int main(void) {
 
         putchar('\n');
         table(45, '#', '#', '#');
-        // pirntf("# Final resualt #\n\t");
-        // treeToInorderPrint(root);
+        printf("# Final resualt #\n\t\n");
+        //
         table(45, '#', '#', '#');
 
         printf("\nDestroy tree log:\n");

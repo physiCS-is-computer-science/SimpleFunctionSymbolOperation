@@ -41,28 +41,28 @@ char chPush(char stack[], char aim, int size) { // 成功则返回压入字符�
     return stack[i];
 }
 char chPop(char stack[], int size) { // 成功则返回弹出の栈顶字符，失败返回 FALSE_CH，栈满时同样弹出栈顶
-    if (stack[0] == FALSE_CH) // 空栈
+    if (stack[0] == FALSE_CH) // stack empty
         return FALSE_CH;
 
     char top;
-    if (stack[size - 1] != FALSE_CH) { // 满栈
+    if (stack[size - 1] != FALSE_CH) { // stack full
         top = stack[size - 1];
         stack[size - 1] = FALSE_CH;
         return top;
     }
 
     int i = -1;
-    while (stack[++i] != FALSE_CH) // 普通情况
+    while (stack[++i] != FALSE_CH) // normal
         continue;
     top = stack[--i];
     stack[i] = FALSE_CH;
     return top;
 }
 char chTop(char stack[], int size) { // 返回栈顶或 FALSE_CH
-    if (stack[size - 1] != FALSE_CH) // 满栈
+    if (stack[size - 1] != FALSE_CH) // stack full
         return stack[size - 1];
 
-    if (stack[0] == FALSE_CH) // 空栈
+    if (stack[0] == FALSE_CH) // stack empty
         return FALSE_CH;
 
     int i = -1;
@@ -99,18 +99,18 @@ Token tokenOpPush(Token stack[], Token aim, int size) { // 返回 被压入栈�
 }
 Token tokenOpPop(Token stack[], int size) { // 失败返回空栈，成功弹出并返回栈顶
     Token emptyToken = {FALSE_CH};
-    if (isEmptyToken(&stack[0])) // 空栈
+    if (isEmptyToken(&stack[0])) // stack empty
         return emptyToken;
 
     Token top;
-    if (!isEmptyToken(&stack[size - 1])) { // 满栈
+    if (!isEmptyToken(&stack[size - 1])) { // stack full
         top = stack[size - 1];
         stack[size - 1].isOp = FALSE_CH;
         stack[size - 1].op = FALSE_CH;
         return top;
     }
 
-    int i = -1; // 普通情况
+    int i = -1; // normal
     while (!isEmptyToken(&stack[++i]))
         continue;
     top = stack[--i];
@@ -119,9 +119,9 @@ Token tokenOpPop(Token stack[], int size) { // 失败返回空栈，成功弹出
     return top;
 }
 Token tokenOpTop(Token stack[], int size) {
-    if (!isEmptyToken(&stack[size - 1])) // 满栈
+    if (!isEmptyToken(&stack[size - 1])) // stack full
         return stack[size - 1];
-    if (isEmptyToken(&stack[0])) // 空栈
+    if (isEmptyToken(&stack[0])) // stack empty
         return stack[0];
 
     int i = -1; // normal situation
@@ -200,30 +200,30 @@ Tree* treePush(Tree* stack[], Tree* aim, int size) {
     return stack[i];
 }
 Tree* treePop(Tree* stack[], int size) { // 失败返回NULL，成功弹出并返回栈顶
-    if (stack[0] == NULL) // 空栈
+    if (stack[0] == NULL) // stack empty
         return NULL;
 
     Tree* top;
-    if (stack[size - 1] != NULL) { // 满栈
+    if (stack[size - 1] != NULL) { // stack full
         top = stack[size - 1];
         stack[size - 1] = NULL;
         return top;
     }
 
-    int i = -1; // 普通情况
+    int i = -1; // normal
     while (stack[++i] != NULL)
         continue;
     top = stack[--i];
     stack[i] = NULL;
     return top;
 }
-Tree* treeTop(Tree* stack[], int size) { // 空栈返回NULL
-    if (stack[size - 1] != NULL) // 满栈
+Tree* treeTop(Tree* stack[], int size) { // 空栈则返回NULL
+    if (stack[size - 1] != NULL) // stack full
         return stack[size - 1];
-    if (stack[0] == NULL) // 空栈
+    if (stack[0] == NULL) // stack empty
         return stack[0];
 
-    int i = -1; // 普通情况
+    int i = -1; // normal
     while (stack[++i] != NULL)
         continue;
     return stack[--i];
@@ -262,7 +262,7 @@ void freeStack(Tree* stack[]) {
     }
 }
 
-Tree* aNode(Token token) { // 转化 Token 为 Tree 并初始化
+Tree* aNode(Token token) { // convert Token to Tree, and initialize it
     Tree* current = (Tree*)malloc(sizeof(Tree));
     clearNode(current);
     if (token.isNum) {
@@ -315,7 +315,7 @@ Tree* copyNode(const Tree* node) { // 副本节点仅仅复制"op""num""var"，�
 Tree* copyTree(const Tree* node) { // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH
     if (node == NULL)
         return NULL;
-    Tree* current = copyNode(node); // 返回副本指针
+    Tree* current = copyNode(node); // return the copy-pointer
     current->left = copyTree(node->left);
     current->right = copyTree(node->right);
     return current;

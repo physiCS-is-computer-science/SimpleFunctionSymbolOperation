@@ -46,7 +46,7 @@ void wrongPrintT(const Token* tokens, const Token* firstWrongToken, const char* 
 
     ptrdiff_t length, deltaLeft;
     deltaLeft = (firstWrongToken - tokens);
-    for (int i = 0; i < COMMAND_SIZE; i++) { // 找末尾指针
+    for (int i = 0; i < COMMAND_SIZE; i++) { // find the end pointer
         if (isEmptyToken(&tokens[i])) {
             length = (&tokens[i] - &tokens[0]);
             break;
@@ -75,9 +75,9 @@ void treePrint(Tree* root, int frameDepth) {
     for (int i = 0; i < frameDepth; i++)
         putchar('\t');
     if (root->isNum)
-        printf("%d|[%.2lf]\n", frameDepth, root->num);
+        printf("%d|(%.2lf)\n", frameDepth, root->num);
     if (root->isVar)
-        printf("%d|[%c]\n", frameDepth, root->var);
+        printf("%d|(%c)\n", frameDepth, root->var);
     if (root->isOp)
         printf("%d|[%c]\n", frameDepth, root->op);
 
@@ -104,7 +104,4 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
         putchar('~');
     putchar('\n');
     table((int)length + 2, '=', '=', '=');
-}
-
-void treeToInorderPrint(Tree* root) {
 }

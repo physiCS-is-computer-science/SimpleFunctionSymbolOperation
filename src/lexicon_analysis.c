@@ -50,14 +50,14 @@ char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
     if (start > end) // 确保 start 指针不大于 end 指针
         return NULL;
 
-    if (start == end && *start == '+') // 只有一个 +
+    if (start == end && *start == '+') // only one +
         return start;
     while (start != end) { // 此处 end 判断不到，因为到 end 就退出循环了
         if (*start != '+')
             return NULL;
         start++;
     }
-    if (*end == '+') // 判断最后一个
+    if (*end == '+') // judge the last one
         return start;
     else
         return NULL;
@@ -314,7 +314,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
             continue;
         }
 
-        Token stackTop = tokenOpTop(opStack, COMMAND_SIZE); // 普通运算符时
+        Token stackTop = tokenOpTop(opStack, COMMAND_SIZE); // normal operator
         if (opLevel(stackTop.op) < opLevel(tokens[i].op) && opLevel(tokens[i].op) != -1) { // 1
             tokenOpPush(opStack, tokens[i], COMMAND_SIZE);
             continue;
@@ -355,7 +355,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
 
         if (isEmptyToken(&tokens[i])) { // 'token字符串' 末尾时
             while (1) { // 出出出出出出出出出出出栈！
-                tmpToken = tokenOpPop(opStack, COMMAND_SIZE); // 弹出
+                tmpToken = tokenOpPop(opStack, COMMAND_SIZE); // pop
                 if (tmpToken.op == '(' || tmpToken.op == ')') // 表达式读取结束时，栈中仍然存在'('或')'，一定为错误
                     return FALSE_CH;
                 if (isEmptyToken(&tmpToken)) // 此时不保证完全正确
@@ -391,7 +391,7 @@ Tree* postfixToTree(Token postfix[]) {
             continue;
         }
 
-        if (current->isOp && current->op == '~') { // 一元负号时
+        if (current->isOp && current->op == '~') { // when unary minus
             tmp = treePop(nodeStack, COMMAND_SIZE);
             if (tmp == NULL) {
                 wrongPrintT(postfix, &postfix[i], "\n<<\n-=-= Stack empty(postfixToTree()) =-=-");

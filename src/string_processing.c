@@ -1,5 +1,5 @@
 /***
- * 谨以此肺腑诗歌，随我纯粹感恩之心灵，为伟大的 formatMathArgument() 函数而献上！希望这是有效的排列组合于您！
+ * 谨以此肺腑诗歌，随我纯粹感恩之心灵，为伟大的 formatMathArgument() 函数献上！希望这是有效的排列组合于您！
  * ---
  * 《圣洁崇高之函数大乐赋》
  * 吃干营养、汗水、汗水；
@@ -9,7 +9,7 @@
  * 毁灭内存宫殿。
  * 赛博蝗灾后是一片废墟，
  * 站在废墟脚下
- * 我仍然忠心。
+ * 我忠心依旧。
  */
 
 #include "linus_unknow_linux.h"
@@ -28,7 +28,7 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     char *firstComma = NULL, *endBracket = NULL;
 
     endBracket = strchr(leftBracket, '\0'); // 先看闭合情况
-    if (*(endBracket - 1) != ')') { // 有括号并且是最后一个才通过
+    if (*(endBracket - 1) != ')') { // if there is a ')' and it is the last one->pass
         wrongPrint(commandOutput, commandOutput, "\n<<\n-=-= The string final character is not ')'(firmatArgumentChar()) =-=-");
         return 0;
     }
@@ -36,11 +36,11 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     firstComma = strchr(leftBracket, ','); // 如果到这一步，','一定在')'左边
     if (firstComma == NULL)
         return 1;
-    if (strchr(firstComma + 1, ',') != NULL) { // 逗号多
+    if (strchr(firstComma + 1, ',') != NULL) { // too many commas
         wrongPrint(commandOutput, firstComma + 1, "\n<<\n-=-= Too many commas(formatArgumentChar()) =-=-");
         return 0;
     }
-    if (*(firstComma + 1) == ')') { // 无第二参数
+    if (*(firstComma + 1) == ')') { // there are not second argument in the situation
         wrongPrint(commandOutput, firstComma, "\n<<\n-=-= The second argument error(formatArgumentChar()) =-=-");
         return 0;
     }
@@ -55,7 +55,7 @@ enum CommandType formatInputCommand(char command[]) {
 
     printf("\n\n>> ");
     fgets(command, COMMAND_SIZE, stdin);
-    if (command[0] == '\n') // 直接Enter时
+    if (command[0] == '\n') // when press key Enter
         return END;
 
     enterPtr = strchr(command, '\n'); // because fgets() read the character '\n'
@@ -145,9 +145,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (type == DIFF_CHAR || type == INTE_CHAR) {
         secondArg = strchr(expStart, '\0');
         secondArg--;
-        diff = secondArg - expStart; // 找到第一个')'，diff 一定小于 COMMAND_SIZE
+        diff = secondArg - expStart; // find the first ')'，diff 一定小于 COMMAND_SIZE
     }
-    else if (type == DIFF_NUM || type == INTE_NUM) { // 第一个','
+    else if (type == DIFF_NUM || type == INTE_NUM) { // the first ','
         secondArg = strchr(expStart, ',');
         diff = secondArg - expStart;
     }

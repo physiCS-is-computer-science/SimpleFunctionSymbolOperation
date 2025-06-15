@@ -27,6 +27,7 @@
 
 Tree* copyTree(const Tree* node); // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH
 void initNode(Tree* node); // 清空该节点的所有
+void destroyTree(Tree* root);
 
 /* 该系列创建符号节点函数仅仅更改符号成员，其他成员由 initNode() 初始化为 FALSE_CH */
 Tree* addNode(void) {
@@ -75,17 +76,6 @@ Tree* sub01(void) { // 0 - 1 node for ~1
     tmp->right = oneNode;
     return tmp;
 }
-
-// bool isNumNode(Tree* root) { // 纯数树判断
-//     if (root == NULL)
-//         return true;
-//     if (!(root->isNum || root->isOp))
-//         return false;
-//     bool leftJudge = isNumNode(root->left);
-//     bool rightJudge = isNumNode(root->right);
-
-//     return leftJudge && rightJudge; // 左右都为真方为纯数树
-// }
 
 void diffAddSub(Tree* root) { // + or -
     root->isDiff = FALSE_CH; // 1 floor
@@ -157,11 +147,35 @@ void diffPow(Tree* root) { // ^
     root->left->right->right->right = one();
 }
 
+bool isNumNode(Tree* root) { // 纯数树判断
+    if (root == NULL)
+        return true;
+    if (!(root->isNum || root->isOp))
+        return false;
+    bool leftJudge = isNumNode(root->left);
+    bool rightJudge = isNumNode(root->right);
+
+    return leftJudge && rightJudge; // 左右都为真方为纯数树
+}
+
 void diff(Tree* root) {
     if (root == NULL)
         return;
 
     if (root->isDiff && root->isOp) {
+        /* 纯数树直接为 0 */
+        if (isNumNode(root)) {
+            root->isOp = FALSE_CH;
+            root->op = FALSE_CH;
+            root->isNum = FALSE_CH;
+            root->num = 0;
+            destroyTree(root->left);
+            destroyTree(root->right);
+            root->left = NULL;
+            root->right = NULL;
+        }
+
+        /* normal */
         if (root->op == '+' || root->op == '-')
             diffAddSub(root);
         else if (root->op == '*')
@@ -170,6 +184,7 @@ void diff(Tree* root) {
             diffDiv(root);
         else if (root->op == '^')
             diffPow(root);
+
         root->isDiff = FALSE_CH; //
     }
     if (root->isDiff && root->isNum) {
