@@ -1,11 +1,11 @@
 /***
  * Please read the file which called README.txt
  * 0Start time: 250501
- * Finish time: 2506
+ * Finish time: 250616
  * Expectation finish time: 250628
  * By MisakaMikoto#^v^#
  *
- * Finish comment: nothing yet.
+ * Finish comment: It's sooooooooooooo hard!!!!!!! and finally over!
  *
  * A verse, hereby dedicated to my bygone days:
  * -----
@@ -96,42 +96,43 @@ int main(void) {
         }
         treeToInfix(root, infixO, -1); // test
 
-        printf("Unsimplified resualt tree:\n");
-        treePrint(root, 1);
+        // printf("Unsimplified resualt tree:\n");
+        // treePrint(root, 1);
 
-        printf("\nnumSimp() log:\n");
+        printf("---\nnumSimp() log:\n");
         numSimp(root); //
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\ntimesOneSimp() log:\n");
+        printf("---\ntimesOneSimp() log:\n");
         timesOneSimp(root); // 1*a == a or a*1 == a
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\ndivOneSimp() log:\n");
+        printf("---\ndivOneSimp() log:\n");
         divOneSimp(root); // a/1 == a
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\npowOneSimp() log:\n");
+        printf("---\npowOneSimp() log:\n");
         powOneSimp(root); // a^1 == a
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\npowZeroSimp() log:\n");
+        printf("---\npowZeroSimp() log:\n");
         powZeroSimp(root); // a^0 == 1
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\naddZeroSimp() log:\n");
+        printf("---\naddZeroSimp() log:\n");
         addZeroSimp(root); // 0+a == a or a+0 == a
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
-        printf("\nsubZeroSimp() log:\n");
+        printf("---\nsubZeroSimp() log:\n");
         subZeroSimp(root); // a-0 == a
-        treePrint(root, 1);
+        // treePrint(root, 1);
 
         treeToInfix(root, infix, -1);
         putchar('\n');
-        printf("## Final resualt ##\n\t");
-        printf("%s\n\t", infixO); // test
-        printf("%s\n", infix);
+        table(24, '>', '>', '>');
+        printf("Unsimplified expression: %s\n", infixO); // test
+        printf("___Final expression___ : %s\n", infix);
+        table(24, '>', '>', '>');
 
         printf("\nDestroy tree log:\n");
         destroyTree(root);

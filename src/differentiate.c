@@ -167,7 +167,7 @@ void diff(Tree* root) {
         if (isNumNode(root)) {
             root->isOp = FALSE_CH;
             root->op = FALSE_CH;
-            root->isNum = FALSE_CH;
+            root->isNum = TRUE_CH;
             root->num = 0;
             destroyTree(root->left);
             destroyTree(root->right);

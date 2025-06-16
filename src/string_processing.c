@@ -182,7 +182,7 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     /* 2.string correct */
     if (expCorrect(expression) == FALSE_CH)
         return NULL;
-    printf("String:\n\t%s\n", expression); // test
+    // printf("String:\n\t%s\n", expression); // test
 
     /* 3.expression -> tokens */
     Token expTokens[COMMAND_SIZE] = {FALSE_CH}; // initialize
@@ -191,9 +191,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (tokenCorrect(expTokens) == FALSE_CH) // check again just for type of ^-
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    printf("Token:\n\t");
-    tokenPrint(expTokens);
-    putchar('\n');
+    // printf("Token:\n\t");
+    // tokenPrint(expTokens);
+    // putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 4.tokens -> postfix */
@@ -201,9 +201,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (tokenToPostfix(expTokens, postfix) == FALSE_CH)
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    printf("Postfix:\n\t");
-    tokenPrint(postfix);
-    putchar('\n');
+    // printf("Postfix:\n\t");
+    // tokenPrint(postfix);
+    // putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 5.postfix -> tree(~a -> (0-a)) */
@@ -211,9 +211,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (expRoot == NULL)
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    printf("Expression tree:\n");
-    treePrint(expRoot, 1);
-    putchar('\n');
+    // printf("Expression tree:\n");
+    // treePrint(expRoot, 1);
+    // putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     return expRoot;
