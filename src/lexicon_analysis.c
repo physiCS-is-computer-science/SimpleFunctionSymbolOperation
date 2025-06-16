@@ -46,7 +46,7 @@ Tree* aNode(Token token);
 void destroyTree(Tree* root);
 void freeStack(Tree* stack[]);
 bool isNumNode(Tree* root);
-void simp(Tree* root);
+void numSimp(Tree* root);
 
 /* return NULL or pointer start */
 char* isAllPlus(char* start, char* end) { // 判断是否全为 ++++++...
@@ -470,7 +470,7 @@ char treeCorrect(Tree* root) {
         return FALSE_CH;
 
     if (root->op == '/' && isNumNode(root->right)) {
-        simp(root->right);
+        numSimp(root->right);
         if (root->right->num == 0) {
             printf("\n<<\n-=-= Cannot 0 after '/'(treeCorrect()) =-=-\n");
             return FALSE_CH;

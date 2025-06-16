@@ -39,16 +39,23 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
 void destroyTree(Tree* root);
 void treePrint(Tree* root, int frameDepth);
-void simp(Tree* root);
 void diff(Tree* root);
 void substitutionX(Tree* root, double x); // 仅仅替换 var 为目标数字
 char treeCorrect(Tree* root);
-void treeToInfix(Tree* root, char* infix, int parentLevel);
+void treeToInfix(const Tree* root, char* infix, int parentLevel);
+void numSimp(Tree* root); // 1
+void timesOneSimp(Tree* root); // 2
+void divOneSimp(Tree* root); // 3
+void powOneSimp(Tree* root); // 4
+void powZeroSimp(Tree* root); // 5
+void addZeroSimp(Tree* root); // 6
+void subZeroSimp(Tree* root); // 7
 
 int main(void) {
     while (1) {
         char isRightTree = FALSE_CH;
         char infix[COMMAND_SIZE] = {'\0'};
+        char infixO[COMMAND_SIZE] = {'\0'}; // test
         double x = -1;
         Tree* root = NULL;
         enum CommandType commandType;
@@ -87,17 +94,43 @@ int main(void) {
             //     bufferClear("---\nThis module is'n supported yet.\n");
             //     continue;
         }
+        treeToInfix(root, infixO, -1); // test
+
         printf("Unsimplified resualt tree:\n");
         treePrint(root, 1);
 
-        printf("\nSimplified tree log:\n");
-        simp(root);
-        printf("\nSimplified resualt tree:\n");
+        printf("\nnumSimp() log:\n");
+        numSimp(root); //
         treePrint(root, 1);
 
-        treeToInfix(root, infix, -1); //
+        printf("\ntimesOneSimp() log:\n");
+        timesOneSimp(root); // 1*a == a or a*1 == a
+        treePrint(root, 1);
+
+        printf("\ndivOneSimp() log:\n");
+        divOneSimp(root); // a/1 == a
+        treePrint(root, 1);
+
+        printf("\npowOneSimp() log:\n");
+        powOneSimp(root); // a^1 == a
+        treePrint(root, 1);
+
+        printf("\npowZeroSimp() log:\n");
+        powZeroSimp(root); // a^0 == 1
+        treePrint(root, 1);
+
+        printf("\naddZeroSimp() log:\n");
+        addZeroSimp(root); // 0+a == a or a+0 == a
+        treePrint(root, 1);
+
+        printf("\nsubZeroSimp() log:\n");
+        subZeroSimp(root); // a-0 == a
+        treePrint(root, 1);
+
+        treeToInfix(root, infix, -1);
         putchar('\n');
-        printf("# Final resualt #\n\t");
+        printf("## Final resualt ##\n\t");
+        printf("%s\n\t", infixO); // test
         printf("%s\n", infix);
 
         printf("\nDestroy tree log:\n");

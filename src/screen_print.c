@@ -16,14 +16,15 @@ void table(int length, char left, char middle, char right) {
 /* help to choose module */
 void mainMenu(void) {
     system("cls"); // depends on windows.h
-    table(25, '+', '-', '+');
+    table(40, '+', '-', '+');
     printf("  1.diff(function)\n");
     printf("  2.diff(function, num)\n");
     // printf(" *3.inte(funcion)\n");
     // printf(" *4.inte(function, left, right)\n");
     printf("  5.Enter to quit\n");
     // printf("  ---\n  Those options that with '*' sign were not supported yet! T~T\n");
-    table(25, '+', '-', '+');
+    printf("  ---\n  Everything is for MisakaMikoto#^v^#!\n");
+    table(40, '+', '-', '+');
 }
 
 void tokenPrint(Token tokens[]) { // the max size of tokens is COMMAND_SIZE. print the tokens array like a string
@@ -108,7 +109,7 @@ void wrongPrint(const char* wrongStr, const char* firstWrongCh, const char* prin
 }
 
 /* strcat() 函数每次都在字符串末尾（即'\0'处）追加新字符串，并且 infix 已经初始化为'\0' */
-void treeToInfix(Tree* root, char* infix, int parentLevel) {
+void treeToInfix(const Tree* root, char* infix, int parentLevel) {
     if (root == NULL)
         return;
 
@@ -122,14 +123,19 @@ void treeToInfix(Tree* root, char* infix, int parentLevel) {
     /* infix */
     treeToInfix(root->left, infix, level);
     if (root->isOp) {
-        sprintf(tmp, "%c", root->op);
+        if (root->op == '*')
+            sprintf(tmp, ""); // 不显示乘号
+        else if (root->op == '^' || root->op == '/')
+            sprintf(tmp, "%c", root->op); // ^/号不分开
+        else
+            sprintf(tmp, " %c ", root->op);
         strcat(infix, tmp);
     }
     else if (root->isNum) {
         if (root->num == (int)(root->num)) // 如果是整数的话
             sprintf(tmp, "%d", (int)(root->num));
         else
-            sprintf(tmp, "%.5lf", root->num);
+            sprintf(tmp, "%.3lf", root->num);
         strcat(infix, tmp);
     }
     else if (root->isVar)
