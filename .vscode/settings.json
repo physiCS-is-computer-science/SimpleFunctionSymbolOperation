@@ -8,7 +8,8 @@
         "windows.h": "c",
         "string.h": "c",
         "for_operation.h": "c",
-        "temp_macro.h": "c"
+        "temp_macro.h": "c",
+        "linus_unknow_linux.h": "c"
     },
     // /* code-runner's setting */
     //   "code-runner.executorMap": { 

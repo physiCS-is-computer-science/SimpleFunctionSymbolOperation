@@ -26,7 +26,7 @@
 #include <stdbool.h>
 
 Tree* copyTree(const Tree* node); // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH
-void initNode(Tree* node); // 清空该节点的所有
+void initNode(Tree* node); // clear all of the node
 void destroyTree(Tree* root);
 
 /* 该系列创建符号节点函数仅仅更改符号成员，其他成员由 initNode() 初始化为 FALSE_CH */

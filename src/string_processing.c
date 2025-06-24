@@ -29,7 +29,7 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
 
     endBracket = strchr(leftBracket, '\0'); // 先看闭合情况
     if (*(endBracket - 1) != ')') { // if there is a ')' and it is the last one->pass
-        wrongPrint(commandOutput, commandOutput, "\n<<\n-=-= The string final character is not ')'(firmatArgumentChar()) =-=-");
+        wrongPrint(commandOutput, commandOutput, "\n<< firmatArgumentChar(): The string final character is not ')'");
         return 0;
     }
 
@@ -37,11 +37,11 @@ int formatArgumentChar(const char* commandOutput, const char* leftBracket) {
     if (firstComma == NULL)
         return 1;
     if (strchr(firstComma + 1, ',') != NULL) { // too many commas
-        wrongPrint(commandOutput, firstComma + 1, "\n<<\n-=-= Too many commas(formatArgumentChar()) =-=-");
+        wrongPrint(commandOutput, firstComma + 1, "\n<< formatArgumentChar(): Too many commas");
         return 0;
     }
     if (*(firstComma + 1) == ')') { // there are not second argument in the situation
-        wrongPrint(commandOutput, firstComma, "\n<<\n-=-= The second argument error(formatArgumentChar()) =-=-");
+        wrongPrint(commandOutput, firstComma, "\n<< formatArgumentChar(): The second argument error");
         return 0;
     }
 
@@ -53,20 +53,20 @@ enum CommandType formatInputCommand(char command[]) {
     char *endPtr, *enterPtr; // enterPtr point to '\n' at the end of the command string
     ptrdiff_t difference;
 
-    printf("\n\n>> ");
-    fgets(command, COMMAND_SIZE, stdin);
-    if (command[0] == '\n') // when press key Enter
-        return END;
+    // printf("\n\n>> ");
+    // fgets(command, COMMAND_SIZE, stdin);
+    // if (command[0] == '\n') // when press key Enter
+    //     return END;
 
-    enterPtr = strchr(command, '\n'); // because fgets() read the character '\n'
-    if (enterPtr != NULL)
-        *enterPtr = '\0';
+    // enterPtr = strchr(command, '\n'); // because fgets() read the character '\n'
+    // if (enterPtr != NULL)
+    //     *enterPtr = '\0';
 
     endPtr = strchr(command, '\0');
     difference = endPtr - command; // length of the string
     if (difference >= COMMAND_SIZE - 1) {
-        bufferClear(NULL); // 只有此时才需要 bufferClear()，否则字符串没超过最大限定长度，缓冲区没东西，bufferClear() 导致程序暂停
-        printf("\n<<\n-=-= The string length has reached the maxium allowable length(%d) =-=-", COMMAND_SIZE - 1);
+        // bufferClear(NULL); // 只有此时才需要 bufferClear()，否则字符串没超过最大限定长度，缓冲区没东西，bufferClear() 导致程序暂停
+        printf("\n<< formatArgumentChar(): The string length has reached the maxium allowable length(%d)", COMMAND_SIZE - 1);
         wrongPrint(command, endPtr, NULL);
         return FALSE_INPUT;
     }
@@ -79,7 +79,7 @@ enum CommandType formatInputCommand(char command[]) {
     strcpy(commandCpy, command); // 为不改变原参数，因而需要复制，前面已经保证了此处字符串 commandCpy 可以装的下所有字符
     tempPtr = strchr(commandCpy, '('); // find command string
     if (tempPtr == NULL) {
-        wrongPrint(commandCpy, commandCpy, "\n<<\n-=-= Command format error(formatInputCommand()) =-=-");
+        wrongPrint(commandCpy, commandCpy, "\n<< formatInputCommand(): Command format error");
         return FALSE_INPUT;
     }
     else
@@ -90,7 +90,7 @@ enum CommandType formatInputCommand(char command[]) {
     else if (strcmp(INTE_STR, commandCpy) == 0)
         type = 2;
     else {
-        wrongPrint(commandCpy, commandCpy, "\n<<\n-=-= Command error(formatInputCommand()) =-=-");
+        wrongPrint(commandCpy, commandCpy, "\n<< formatInputCommand(): Command error");
         return FALSE_INPUT;
     }
     *tempPtr = '('; // 恢复先
@@ -115,7 +115,7 @@ enum CommandType formatInputCommand(char command[]) {
         break;
     }
 
-    wrongPrint(command, command, "\n<<\n-=-= This string have some error(formatInputCommand()) =-=-");
+    wrongPrint(command, command, "\n<< formatInputCommand(): This string have some error");
     return FALSE_INPUT;
 }
 
@@ -134,7 +134,7 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     expStart = strchr(command, '(');
     expStart++; // 括号一定闭合，即一定有右括号在下一个地址，因此该指针操作无风险, expStart is the next pointer of '('
     if (*expStart == ',' || *expStart == ')') { // this situation be like: diff(,) or diff()
-        wrongPrint(command, expStart, "\n<<\n-=-= The expression is not exist(formatMathArgument()) =-=-");
+        wrongPrint(command, expStart, "\n<< formatMathArgument(): The expression is not exist");
         return NULL;
     }
 
@@ -163,11 +163,11 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     case DIFF_NUM:
         tmpX = (double)strtod(secondArg, &secondEnd);
         if (secondEnd == secondArg) { //
-            wrongPrint(command, secondEnd, "\n<<\n-=-= Second argument error(formatMathArgument()) =-=-");
+            wrongPrint(command, secondEnd, "\n<< formatMathArgument(): Second argument error");
             return FALSE_INPUT;
         }
         if (*secondEnd != ')') { // 数字之后必为 ')'
-            wrongPrint(command, secondEnd, "\n<<\n-=-= This character should be ')'(formatMathArgument()) =-=-");
+            wrongPrint(command, secondEnd, "\n<< formatMathArgument(): This character should be ')'");
             return FALSE_INPUT;
         }
         *x = tmpX;
@@ -191,9 +191,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (tokenCorrect(expTokens) == FALSE_CH) // check again just for type of ^-
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    // printf("Token:\n\t");
-    // tokenPrint(expTokens);
-    // putchar('\n');
+    printf("Token:\n\t");
+    tokenPrint(expTokens);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 4.tokens -> postfix */
@@ -201,9 +201,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (tokenToPostfix(expTokens, postfix) == FALSE_CH)
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    // printf("Postfix:\n\t");
-    // tokenPrint(postfix);
-    // putchar('\n');
+    printf("Postfix:\n\t");
+    tokenPrint(postfix);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     /* 5.postfix -> tree(~a -> (0-a)) */
@@ -211,9 +211,9 @@ Tree* formatMathArgument(const char command[], enum CommandType type, double* x)
     if (expRoot == NULL)
         return NULL;
     /* -=-=-=-=-= StartTest =-=-=-=-=- */
-    // printf("Expression tree:\n");
-    // treePrint(expRoot, 1);
-    // putchar('\n');
+    printf("Expression tree:\n");
+    treePrint(expRoot, 1);
+    putchar('\n');
     /* -=-=-=-=-= 00EndTest =-=-=-=-=- */
 
     return expRoot;

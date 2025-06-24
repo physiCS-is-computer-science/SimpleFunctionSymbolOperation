@@ -13,7 +13,10 @@ cmake_minimum_required(VERSION 3.20.0)
 set(PROJECT_NAME "symbol_operation") # storage the name "xxx" in variable PROJECT_NAME
 project(${PROJECT_NAME}) # Project name
 
-# set(CMAKE_EXE_LINKER_FLAGS "-static") # 链接静态库
+# # 设置为 Windows 应用程序（去除控制台窗口）
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -mwindows")
+
+set(CMAKE_EXE_LINKER_FLAGS "-static") # 链接静态库
 
 set(CMAKE_C_STANDARD 11) # Specify the C language standard
 # set(CMAKE_CXX_STANDARD 17) # Specify the C++ language standard
@@ -29,6 +32,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${EXE_OUTPUT_DIR}) # exe's output path: EXE_O
 file(GLOB_RECURSE SOURCE "src/*.c") # Recursively search all .c files in path src/*.c and store them in SOURCE
 
 add_executable(${PROJECT_NAME} ${SOURCE}) # Compile all .c files of ${SOURCE}
+
+# 链接 Windows GUI 所需的库
+target_link_libraries(${PROJECT_NAME} gdi32 user32)
 
 target_include_directories(${PROJECT_NAME} PRIVATE include) # fine header files in path include/xxx.h
 
