@@ -32,7 +32,7 @@ void tokenPrint(Token tokens[]) { // the max size of tokens is COMMAND_SIZE. pri
         if (isEmptyToken(&tokens[i]))
             break;
         if (tokens[i].isNum)
-            printf("%d", tokens[i].num);
+            printf("%lf", tokens[i].num);
         else if (tokens[i].isOp)
             printf("%c", tokens[i].op);
         else if (tokens[i].isVar)
@@ -134,8 +134,9 @@ void treeToInfix(const Tree* root, char* infix, int parentLevel) {
     else if (root->isNum) {
         if (root->num == (int)(root->num)) // 如果是整数的话
             sprintf(tmp, "%d", (int)(root->num));
+        // else if (root->num == 1 && parentLevel == opLevel('^')) // hide '-1', show '-'
         else
-            sprintf(tmp, "%.3lf", root->num);
+            sprintf(tmp, "%.4lf", root->num);
         strcat(infix, tmp);
     }
     else if (root->isVar)

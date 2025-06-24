@@ -7,8 +7,6 @@
         "time.h": "c",
         "windows.h": "c",
         "string.h": "c",
-        "for_operation.h": "c",
-        "temp_macro.h": "c",
         "linus_unknow_linux.h": "c"
     },
     // /* code-runner's setting */

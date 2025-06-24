@@ -11,8 +11,12 @@
  |           |            |   /  \      |   /  \        |   /  \      |         |
  |           |            | [c]  [c]    | [x] [c+1]     | [x]  [2]    |         |
  |-----------|------------|-------------|---------------|-------------|--------*/
- /***
-  * just processing: inte(ax^n)
-  */
+/***
+ * just processing: inte(ax^n)
+ */
 
-  
+#include "linus_unknow_linux.h"
+
+void inte(Tree* root) {
+    
+}

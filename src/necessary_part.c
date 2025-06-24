@@ -137,7 +137,7 @@ char isTokenOpStackEmpty(Token stack[]) { // 判断 token 类型栈是否为空
 }
 
 void fillChToken(Token* aim, char ch) {
-    if (strchr("x", ch) != NULL) {
+    if (strchr("x", ch) != NULL) { // 一定是x，不可能为'\0'，因为 convertToken() 调用时保证不会传递'\0'
         aim->isVar = TRUE_CH;
         aim->var = ch;
     }
@@ -147,7 +147,7 @@ void fillChToken(Token* aim, char ch) {
     }
 }
 
-void fillNumToken(Token* aim, int num) {
+void fillNumToken(Token* aim, double num) {
     aim->isNum = TRUE_CH;
     aim->num = num;
 }

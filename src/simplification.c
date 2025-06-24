@@ -8,14 +8,14 @@
 void destroyTree(Tree* root);
 bool isNumNode(Tree* root);
 
-void numSimp(Tree* root) {
+void numSimp(Tree* root, char div) {
     if (root == NULL)
         return;
 
-    numSimp(root->left);
-    numSimp(root->right);
+    numSimp(root->left, div);
+    numSimp(root->right, div);
 
-    /* a +-*^ a，除法总是出小数，不考虑 */
+    /* a +-*^/ a，除法总是出小数，如果 div == FALSE_CH 则不考虑除法 */
     if (root->isOp && root->left->isNum && root->right->isNum && root->op != '/') {
         double lNum = root->left->num, rNum = root->right->num;
 
@@ -27,6 +27,18 @@ void numSimp(Tree* root) {
             root->num = lNum * rNum;
         else if (root->op == '^')
             root->num = pow(lNum, rNum);
+
+        root->isOp = FALSE_CH;
+        root->op = FALSE_CH;
+        root->isNum = TRUE_CH;
+
+        destroyTree(root->left);
+        destroyTree(root->right);
+        root->left = NULL;
+        root->right = NULL;
+    }
+    else if (root->isOp && root->left->isNum && root->right->isNum && root->op == '/' && div == '/') { // div == '/'
+        root->num = root->left->num / root->right->num;
 
         root->isOp = FALSE_CH;
         root->op = FALSE_CH;
@@ -123,7 +135,7 @@ void powOneSimp(Tree* root) {
     powOneSimp(root->right);
 
     if (root->isOp && root->op == '^' && isNumNode(root->right)) {
-        numSimp(root->right);
+        numSimp(root->right, FALSE_CH);
         if (root->right->isNum && root->right->num == 1) {
             Tree* tmp = root->left;
             destroyTree(root->right);
@@ -143,7 +155,7 @@ void powZeroSimp(Tree* root) {
     powZeroSimp(root->right);
 
     if (root->isOp && root->op == '^' && isNumNode(root->right)) {
-        numSimp(root->right);
+        numSimp(root->right, FALSE_CH);
         if (root->right->isNum && root->right->num == 0) {
             destroyTree(root->left);
             destroyTree(root->right);
@@ -193,7 +205,7 @@ void subZeroSimp(Tree* root) {
     subZeroSimp(root->right);
 
     if (root->isOp && root->op == '-' && isNumNode(root->right)) {
-        numSimp(root->right);
+        numSimp(root->right, FALSE_CH);
         if (root->right->isNum && root->right->num == 0) {
             Tree* tmp = root->left;
             destroyTree(root->right);

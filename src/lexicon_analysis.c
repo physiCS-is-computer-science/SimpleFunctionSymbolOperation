@@ -27,7 +27,7 @@
 #include <string.h>
 
 void fillChToken(Token* aim, char ch);
-void fillNumToken(Token* aim, int num);
+void fillNumToken(Token* aim, double num);
 Token* tokenChFind(Token* tokens, char aim);
 char isEmptyToken(Token* tmp); // 判断单个 token 是否为空
 char chPush(char stack[], char aim, int size);
@@ -215,9 +215,9 @@ char expCorrect(char exp[]) {
         }
     }
 
-    /* 4.查非法字符(非"1234567890 x()+-/^*~"), 空格为合法字符 */
+    /* 4.查非法字符(非"1234567890 x()+-/^*~."), 空格为合法字符 */
     for (char* currPtr = exp; *currPtr != '\0'; currPtr++) {
-        if (strchr("1234567890 x()+-/^*~", *currPtr) == NULL) {
+        if (strchr("1234567890 x()+-/^*~.", *currPtr) == NULL) {
             wrongPrint(exp, currPtr, "\n<< expCorrect(): Illegal characters");
             return FALSE_CH;
         }
@@ -227,9 +227,9 @@ char expCorrect(char exp[]) {
     char* currPtr = exp;
     for (; *currPtr != '\0'; currPtr++)
         continue;
-    currPtr--;
-    if (strchr("+-*/^(", *currPtr) != NULL) {
-        wrongPrint(exp, currPtr, "\n<< expCorrect(): Should not be an operator");
+    currPtr--; // the previous of '\0'
+    if (strchr("+-*/^(.", *currPtr) != NULL) {
+        wrongPrint(exp, currPtr, "\n<< expCorrect(): Should be not an operator");
         return FALSE_CH;
     }
 
@@ -238,10 +238,10 @@ char expCorrect(char exp[]) {
 
 char convertToken(char exp[], Token tokens[]) { // the size of expTokens and expression is COMMAND_SIZE
     char *numStart = NULL, *numEnd = NULL;
-    int num, numLength;
+    int numLength;
+    double num;
 
     for (int tokenI = 0, expI = 0; tokenI < COMMAND_SIZE - 3; expI++) { // 确保 token 末尾有空 token 作为结束
-
         if (exp[expI] == FALSE_CH) // '\0'
             return TRUE_CH;
         if (exp[expI] == ' ')
@@ -251,9 +251,14 @@ char convertToken(char exp[], Token tokens[]) { // the size of expTokens and exp
             fillChToken(&tokens[tokenI], exp[expI]);
             tokenI++;
         }
-        else if (isdigit(exp[expI])) {
+        else if (isdigit(exp[expI]) || exp[expI] == '.') {
             numStart = &exp[expI];
-            num = (int)strtol(numStart, &numEnd, 10); // numEnd 是最后一个数字字符的下一个字符
+            num = (double)strtod(numStart, &numEnd); // numEnd 是最后一个数字字符的下一个字符
+
+            if (*numEnd == '.') {
+                wrongPrint(exp, numEnd, "\n<< convertToken(): Point error");
+                return FALSE_CH;
+            }
 
             numLength = (int)(numEnd - numStart);
             expI = expI + numLength - 1; // 字符串指针偏移量，循环结束后 expI 会自增因此此处减1
@@ -286,7 +291,7 @@ char tokenToPostfix(Token tokens[], Token postfix[]) { // max: COMMAND_SIZE
     Token opStack[COMMAND_SIZE] = {FALSE_CH};
 
     for (int i = 0, j = 0; i < COMMAND_SIZE; i++) {
-        if (tokens[i].isNum || tokens[i].isVar) {
+        if (tokens[i].isNum || tokens[i].isVar) { // 数字/x直接入
             postfix[j++] = tokens[i];
             continue;
         }

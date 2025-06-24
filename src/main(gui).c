@@ -33,16 +33,18 @@
 #include "linus_unknow_linux.h"
 #include <windows.h>
 
-Tree* formatMathArgument(const char command[], enum CommandType type, double* x); // check the argument of command, return 1/0
+Tree* formatMathArgument(const char command[], enum CommandType type, double* x, double* right); // check the argument of command, return 1/0
 enum CommandType formatInputCommand(char command[]); // if the string command of inputing is format, return 1 ~ 5
+Tree* copyTree(const Tree* node);
 void destroyTree(Tree* root);
 char treeCorrect(Tree* root);
 void treePrint(Tree* root, int frameDepth);
 void table(int length, char left, char middle, char right);
 void diff(Tree* root);
+void inte(Tree* root);
 void substitutionX(Tree* root, double x); // 仅仅替换 var 为目标数字
 void treeToInfix(const Tree* root, char* infix, int parentLevel);
-void numSimp(Tree* root); // 1
+void numSimp(Tree* root, char div); // 1
 void timesOneSimp(Tree* root); // 2
 void divOneSimp(Tree* root); // 3
 void powOneSimp(Tree* root); // 4
@@ -57,9 +59,7 @@ char* calculateMain(char command[]) {
     printf("-=-=-=-=-=-= Applications Log =-=-=-=-=-=-\n\n");
 
     char isRightTree = FALSE_CH;
-    char infixO[COMMAND_SIZE] = {'\0'}; // test
-    char outputCommand[COMMAND_SIZE] = {'\0'};
-    double x = -1;
+    double x = -1, rightNum = -1;
     Tree* root = NULL;
     enum CommandType commandType;
 
@@ -69,7 +69,7 @@ char* calculateMain(char command[]) {
     if (commandType == FALSE_INPUT)
         return NAN;
     else if (commandType >= DIFF_CHAR && commandType <= INTE_NUM) // identify the command mode
-        root = formatMathArgument(command, commandType, &x);
+        root = formatMathArgument(command, commandType, &x, &rightNum);
     isRightTree = treeCorrect(root);
     if (!isRightTree || root == NULL) {
         destroyTree(root);
@@ -81,27 +81,57 @@ char* calculateMain(char command[]) {
     case DIFF_CHAR:
         root->isDiff = TRUE_CH;
         diff(root);
+
+        printf("---\nnumSimp(root, FALSE_CH) log:\n");
+        numSimp(root, FALSE_CH); //
+        treePrint(root, 1);
         break;
 
     case DIFF_NUM:
         root->isDiff = TRUE_CH;
         diff(root);
-        substitutionX(root, x);
+        substitutionX(root, x); // 带入导数点
+
+        printf("---\nnumSimp(root, '/') log:\n");
+        numSimp(root, '/'); //
+        treePrint(root, 1);
+
+        treeToInfix(root, infix, -1);
+
+        printf("\nDestroy tree log:\n");
+        destroyTree(root);
+        return infix; // 无需化简直接计算数值转化字符串传递
+
+    case INTE_CHAR:
+        root->isInte = TRUE_CH;
+        inte(root);
+
+        printf("---\nnumSimp(root, FALSE_CH) log:\n");
+        numSimp(root, FALSE_CH);
+        treePrint(root, 1);
         break;
 
-        // case INTE_CHAR:
-        // case INTE_NUM:
-        //     bufferClear("---\nThis module is'n supported yet.\n");
-        //     continue;
+    case INTE_NUM:
+        root->isInte = TRUE_CH;
+        Tree* rootCopy = copyTree(root);
+        inte(root);
+        inte(rootCopy);
+
+        substitutionX(root, rightNum); // 上限
+        substitutionX(rootCopy, x); // 下限
+
+        printf("---\nnumSimp(root, '/') log:\nthe root:\n");
+        numSimp(root, '/');
+        printf("the rootCopy:\n");
+        numSimp(rootCopy, '/');
+        sprintf(infix, "%lf", root->num - rootCopy->num);
+
+        printf("\nDestroy tree log:\nthe root:\n");
+        destroyTree(root);
+        printf("the rootCopy:\n");
+        destroyTree(rootCopy);
+        return infix; // 直接算好了数值
     }
-    treeToInfix(root, infixO, -1); // test
-
-    printf("Unsimplified resualt tree:\n");
-    treePrint(root, 1);
-
-    printf("---\nnumSimp() log:\n");
-    numSimp(root); //
-    treePrint(root, 1);
 
     printf("---\ntimesOneSimp() log:\n");
     timesOneSimp(root); // 1*a == a or a*1 == a
@@ -128,14 +158,12 @@ char* calculateMain(char command[]) {
     treePrint(root, 1);
 
     treeToInfix(root, infix, -1);
-    putchar('\n');
-    printf("Unsimplified expression: %s\n", infixO); // test
 
     printf("\nDestroy tree log:\n");
     destroyTree(root);
 
     printf("\n-=-=-=-=-=-=-= Log End =-=-=-=-=-=-=-");
-    
+
     return infix;
 }
 
@@ -143,7 +171,9 @@ char* calculateMain(char command[]) {
 void OnCalculate(HWND hwnd) {
     char commandInput[COMMAND_SIZE] = {'\0'};
     GetWindowText(hInput, commandInput, sizeof(commandInput)); //
+
     char* output = calculateMain(commandInput);
+
     SetWindowText(hOutput, output);
     if (strcmp(output, NAN) != 0) // NAN不是动态分配内存，不需要释放
         free(output);

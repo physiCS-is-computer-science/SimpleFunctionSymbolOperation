@@ -24,7 +24,7 @@ typedef struct BinaryTreeCell {
 
 typedef struct ExpressionTerm {
     char isVar, isOp, isNum, var, op;
-    int num;
+    double num;
 } Token;
 
 enum CommandType {
