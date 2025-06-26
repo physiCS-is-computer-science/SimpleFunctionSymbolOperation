@@ -2,7 +2,7 @@
  * ### Please read the file which called README.txt ###
  *
  * 0Start time: 250501
- * Finish time: 250616
+ * Finish time: 250626
  * Expectation finish time: 250629
  * By MisakaMikoto#^v^#
  *
