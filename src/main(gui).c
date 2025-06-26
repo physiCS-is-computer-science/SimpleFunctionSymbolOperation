@@ -38,6 +38,7 @@ enum CommandType formatInputCommand(char command[]); // if the string command of
 Tree* copyTree(const Tree* node);
 void destroyTree(Tree* root);
 char treeCorrect(Tree* root);
+char inteTreeCorrect(Tree* root);
 void treePrint(Tree* root, int frameDepth);
 void table(int length, char left, char middle, char right);
 void diff(Tree* root);
@@ -66,12 +67,15 @@ char* calculateMain(char command[]) {
     char* infix = (char*)calloc(COMMAND_SIZE, sizeof(char));
 
     commandType = formatInputCommand(command);
-    if (commandType == FALSE_INPUT)
+    if (commandType == FALSE_INPUT) {
+        free(infix);
         return NAN;
+    }
     else if (commandType >= DIFF_CHAR && commandType <= INTE_NUM) // identify the command mode
         root = formatMathArgument(command, commandType, &x, &rightNum);
     isRightTree = treeCorrect(root);
     if (!isRightTree || root == NULL) {
+        free(infix);
         destroyTree(root);
         return NAN;
     }
@@ -102,18 +106,39 @@ char* calculateMain(char command[]) {
         destroyTree(root);
         return infix; // 无需化简直接计算数值转化字符串传递
 
-    case INTE_CHAR:
-        root->isInte = TRUE_CH;
+    case INTE_CHAR: // 不考虑'/'积分，c/c直接运算出结果
+        root->isInte = TRUE_CH; // test
+
+        printf("---\nnumSimp(root, '/') log:\n");
+        numSimp(root, '/');
+
+        if (inteTreeCorrect(root) == FALSE_CH) {
+            free(infix);
+            destroyTree(root);
+            return NAN;
+        }
         inte(root);
 
-        printf("---\nnumSimp(root, FALSE_CH) log:\n");
-        numSimp(root, FALSE_CH);
+        printf("---\nnumSimp(root, '/') log:\n");
+        numSimp(root, '/');
         treePrint(root, 1);
+
         break;
 
     case INTE_NUM:
         root->isInte = TRUE_CH;
+
+        printf("---\nnumSimp(root, '/') log:\n");
+        numSimp(root, '/');
+
+        if (inteTreeCorrect(root) == FALSE_CH) {
+            free(infix);
+            destroyTree(root);
+            return NAN;
+        }
         Tree* rootCopy = copyTree(root);
+        rootCopy->isInte = TRUE_CH; // copyTree() 函数初始化 isInte 为 FALSE_CH
+
         inte(root);
         inte(rootCopy);
 
@@ -130,9 +155,11 @@ char* calculateMain(char command[]) {
         destroyTree(root);
         printf("the rootCopy:\n");
         destroyTree(rootCopy);
+
         return infix; // 直接算好了数值
     }
 
+    /* 符号计算走这里，数值计算在这之上已经 return 了 */
     printf("---\ntimesOneSimp() log:\n");
     timesOneSimp(root); // 1*a == a or a*1 == a
     treePrint(root, 1);
@@ -157,13 +184,15 @@ char* calculateMain(char command[]) {
     subZeroSimp(root); // a-0 == a
     treePrint(root, 1);
 
+    /* tree convert to infix expression */
     treeToInfix(root, infix, -1);
+    if (commandType == INTE_CHAR)
+        strcat(infix, " + C");
 
     printf("\nDestroy tree log:\n");
     destroyTree(root);
 
     printf("\n-=-=-=-=-=-=-= Log End =-=-=-=-=-=-=-");
-
     return infix;
 }
 

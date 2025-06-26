@@ -5,6 +5,7 @@
 
 #include "linus_unknow_linux.h"
 #include <string.h>
+#include <stdbool.h>
 
 void __processQuitGetchar(void) { // 临时中断程序函数
     printf("-=-= Enter to end the process(__processQuitGetchar()) =-=-");
@@ -319,4 +320,70 @@ Tree* copyTree(const Tree* node) { // 由 node 往下的树复制一份并返回
     current->left = copyTree(node->left);
     current->right = copyTree(node->right);
     return current;
+}
+
+/* 该系列创建符号节点函数仅仅更改符号成员，其他成员由 initNode() 初始化为 FALSE_CH */
+Tree* addNode(void) {
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isOp == TRUE_CH;
+    node->op = '+';
+    return node;
+}
+Tree* subNode(void) {
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isOp = TRUE_CH;
+    node->op = '-';
+    return node;
+}
+Tree* timesNode(void) {
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isOp = TRUE_CH;
+    node->op = '*';
+    return node;
+}
+Tree* powNode(void) {
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isOp = TRUE_CH;
+    node->op = '^';
+    return node;
+}
+Tree* one(void) { // 1 node
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isNum = TRUE_CH;
+    node->num = 1;
+    return node;
+}
+Tree* sub01(void) { // 0 - 1 node for ~1
+    Tree *zero = (Tree*)malloc(sizeof(Tree)), *tmp = subNode(), *oneNode = one();
+
+    initNode(zero);
+    zero->isNum = TRUE_CH;
+    zero->num = 0;
+
+    tmp->left = zero;
+    tmp->right = oneNode;
+    return tmp;
+}
+Tree* varNode(void){ // x
+    Tree* node = (Tree*)malloc(sizeof(Tree));
+    initNode(node);
+    node->isVar = TRUE_CH;
+    node->var = 'x';
+    return node;
+}
+
+bool isNumNode(Tree* root) { // 纯数树判断
+    if (root == NULL)
+        return true;
+    if (!(root->isNum || root->isOp))
+        return false;
+    bool leftJudge = isNumNode(root->left);
+    bool rightJudge = isNumNode(root->right);
+
+    return leftJudge && rightJudge; // 左右都为真方为纯数树
 }

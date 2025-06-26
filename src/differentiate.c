@@ -28,55 +28,15 @@
 Tree* copyTree(const Tree* node); // 由 node 往下的树复制一份并返回根节点指针，副本树仅仅复制"op""num""var""left""right"，其他的都初始化为FALSE_CH
 void initNode(Tree* node); // clear all of the node
 void destroyTree(Tree* root);
+Tree* addNode(void);
+Tree* subNode(void);
+Tree* timesNode(void);
+Tree* powNode(void);
+Tree* one(void);
+Tree* sub01(void);
+bool isNumNode(Tree* root);
 
-/* 该系列创建符号节点函数仅仅更改符号成员，其他成员由 initNode() 初始化为 FALSE_CH */
-Tree* addNode(void) {
-    Tree* node = (Tree*)malloc(sizeof(Tree));
-    initNode(node);
-    node->isOp == TRUE_CH;
-    node->op = '+';
-    return node;
-}
-Tree* subNode(void) {
-    Tree* node = (Tree*)malloc(sizeof(Tree));
-    initNode(node);
-    node->isOp = TRUE_CH;
-    node->op = '-';
-    return node;
-}
-Tree* timesNode(void) {
-    Tree* node = (Tree*)malloc(sizeof(Tree));
-    initNode(node);
-    node->isOp = TRUE_CH;
-    node->op = '*';
-    return node;
-}
-Tree* powNode(void) {
-    Tree* node = (Tree*)malloc(sizeof(Tree));
-    initNode(node);
-    node->isOp = TRUE_CH;
-    node->op = '^';
-    return node;
-}
-Tree* one(void) { // 1 node
-    Tree* node = (Tree*)malloc(sizeof(Tree));
-    initNode(node);
-    node->isNum = TRUE_CH;
-    node->num = 1;
-    return node;
-}
-Tree* sub01(void) { // 0 - 1 node for ~1
-    Tree *zero = (Tree*)malloc(sizeof(Tree)), *tmp = subNode(), *oneNode = one();
-
-    initNode(zero);
-    zero->isNum = TRUE_CH;
-    zero->num = 0;
-
-    tmp->left = zero;
-    tmp->right = oneNode;
-    return tmp;
-}
-
+/* differentiate module */
 void diffAddSub(Tree* root) { // + or -
     root->isDiff = FALSE_CH; // 1 floor
 
@@ -147,17 +107,6 @@ void diffPow(Tree* root) { // ^
     root->left->right->right->right = one();
 }
 
-bool isNumNode(Tree* root) { // 纯数树判断
-    if (root == NULL)
-        return true;
-    if (!(root->isNum || root->isOp))
-        return false;
-    bool leftJudge = isNumNode(root->left);
-    bool rightJudge = isNumNode(root->right);
-
-    return leftJudge && rightJudge; // 左右都为真方为纯数树
-}
-
 void diff(Tree* root) {
     if (root == NULL)
         return;
@@ -187,11 +136,11 @@ void diff(Tree* root) {
 
         root->isDiff = FALSE_CH; //
     }
-    if (root->isDiff && root->isNum) {
+    else if (root->isDiff && root->isNum) {
         root->num = 0;
         root->isDiff = FALSE_CH; //
     }
-    if (root->isDiff && root->isVar) {
+    else if (root->isDiff && root->isVar) {
         root->isVar = FALSE_CH;
         root->var = FALSE_CH;
         root->isNum = TRUE_CH;
